@@ -17,8 +17,8 @@ spring:
       client:
         registration:
           fusionauth:
-            client-id: f7427948-34ae-4dc0-920d-f50316d67d70
-            client-secret: RLN9NlryIkmXw6_BNbsxs-95sOlHpRV7nG11M0jgonI
+            client-id: d1f69791-a04e-4e93-8460-7e2242844c53
+            client-secret: No7z2JoKT6-0TAoYFZDGEuhNRDkjpWzdOBjtTjrzxZ0
             scope: openid, profile, email
             redirect-uri: http://localhost:8080/auth/callback
             authorization-grant-type: authorization_code

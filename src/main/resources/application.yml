@@ -3,8 +3,8 @@ spring:
     name: onramp
   datasource:
     url: jdbc:mysql://localhost:3306/onramper
-    username:
-    password:
+    username: root
+    password: my-secret-pw
   jpa:
     hibernate:
       ddl-auto: update
@@ -23,6 +23,7 @@ spring:
             redirect-uri: http://localhost:8080/auth/callback
             authorization-grant-type: authorization_code
             client-authentication-method: post
+
         provider:
           fusionauth:
             authorization-uri: http://localhost:9011/oauth2/authorize
@@ -30,3 +31,22 @@ spring:
             user-info-uri: http://localhost:9011/oauth2/userinfo
             jwk-set-uri: http://localhost:9011/.well-known/jwks.json
             user-name-attribute: sub
+
+encryption:
+  password: b684cc8de26de8ea4e363acc7d1e019622bf6d7795cd5e5d5ba33d147219cf2b
+  salt: 6d2e87b80aa9e98edde68ac8944685bcba8880159be8b21660989878fbb2231e
+
+auth:
+  url: http://localhost:9011/oauth2/token
+  client_id: d1f69791-a04e-4e93-8460-7e2242844c53
+  client_secret: No7z2JoKT6-0TAoYFZDGEuhNRDkjpWzdOBjtTjrzxZ0
+  grant_type: password
+  scope: openid profile email
+
+fusionauth:
+  application_id: d1f69791-a04e-4e93-8460-7e2242844c53	  # Ensure this is a valid UUID
+  passwordless:
+    url: http://localhost:9011/api/passwordless/start
+    login_url: http://localhost:9011/api/passwordless/login
+  search_url: http://localhost:9011/api/user/search
+  bearer_token: yJBgEtj9mCspXV1Ukk0uZd-K5s_vntr1fbGBtKmSfXZ_SMtEfqPf3P4x

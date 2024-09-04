@@ -18,8 +18,7 @@ public class SecurityConfig {
         http
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/", "/login**", "/error").permitAll()
-                .requestMatchers("/secure").authenticated()
+                .requestMatchers("/", "/login**", "/error","/sendOtp", "/verifyOtp", "/magicLink", "/sso/**").permitAll()
                 .anyRequest().authenticated()
             )
             .oauth2ResourceServer(oauth2 -> oauth2

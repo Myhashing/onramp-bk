@@ -45,4 +45,9 @@ public class ApiResponse<T> {
     public void setError(String error) {
         this.error = error;
     }
+       // Method to create error response
+    public static <T> ApiResponse<T> createErrorResponse(int status, String message, String error) {
+        return new ApiResponse<>(status, message, null, error);
+    }
+
 }

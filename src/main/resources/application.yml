@@ -50,3 +50,4 @@ fusionauth:
     login_url: http://localhost:9011/api/passwordless/login
   search_url: http://localhost:9011/api/user/search
   bearer_token: yJBgEtj9mCspXV1Ukk0uZd-K5s_vntr1fbGBtKmSfXZ_SMtEfqPf3P4x
+  registration_url: http://localhost:9011/api/user/registration

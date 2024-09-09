@@ -11,7 +11,8 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
-
+        format_sql: true
+    show-sql: true
   security:
     oauth2:
       client:
@@ -31,6 +32,11 @@ spring:
             user-info-uri: http://localhost:9011/oauth2/userinfo
             jwk-set-uri: http://localhost:9011/.well-known/jwks.json
             user-name-attribute: sub
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: yourpassword
 
 encryption:
   password: b684cc8de26de8ea4e363acc7d1e019622bf6d7795cd5e5d5ba33d147219cf2b
@@ -53,3 +59,45 @@ fusionauth:
   registration_url: http://localhost:9011/api/user/registration
   base-url: http://localhost:9011
   api-key: yJBgEtj9mCspXV1Ukk0uZd-K5s_vntr1fbGBtKmSfXZ_SMtEfqPf3P4x
+
+
+nobitex:
+  api:
+    base-url: https://api.nobitex.ir
+
+logging:
+  file:
+    name: logs/onramp.log
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    com.onramp.controller: DEBUG
+    com.onramp.service: DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.web: DEBUG
+
+elastic:
+  apm:
+    service_name: my-spring-app
+    server_urls: http://localhost:8200
+    environment: production
+    application_packages: com.onramp
+
+
+management:
+  endpoint:
+    web:
+      exposure:
+        include: "*"
+  metrics:
+    export:
+      elasticsearch:
+        enabled: true
+        host: http://localhost:9201  # Elasticsearch URL
+        index: metrics-onramp  # Customize the index name
+  elastic:
+    metrics:
+      export:
+        enabled: true
+        host: http://localhost:9201  # Elasticsearch URL
+        index: metrics-onramp  # Customize the index name

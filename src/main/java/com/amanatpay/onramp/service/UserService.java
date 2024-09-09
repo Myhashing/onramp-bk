@@ -39,4 +39,9 @@ public class UserService {
         UserRequest userRequest = new UserRequest(user);
         fusionAuthClient.updateUser(userId, userRequest);
     }
+
+    public KycUpdateRequest getKyc(UUID userId) {
+    // Implement the logic to retrieve KYC information for the user
+    return new KycUpdateRequest();
+    }
 }

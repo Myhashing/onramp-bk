@@ -2,21 +2,22 @@ package com.amanatpay.onramp.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-@Entity
 @Data
-public class NobitexOrderBookData extends Auditable {
+@Entity
+public class TransactionsSettingData extends Auditable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-    @Column(columnDefinition = "TEXT")
-    private String data;
+    private String settingName;
+    private String settingValue;
+    private String description;
 
-    private Timestamp timestamp;
 
 }

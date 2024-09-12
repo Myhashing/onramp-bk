@@ -1,12 +1,17 @@
 package com.amanatpay.onramp.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import lombok.Data;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @Entity
-public class PartnerBusiness {
+@Data
+public class PartnerBusiness extends Auditable {
 
     @Id
     private Long id;
@@ -14,36 +19,8 @@ public class PartnerBusiness {
     private BigDecimal commissionValue;
     private String commissionType; // "PERCENTAGE" or "FIXED"
 
-    // Getters and setters
-    public Long getId() {
-        return id;
-    }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
 
-    public String getName() {
-        return name;
-    }
 
-    public void setName(String name) {
-        this.name = name;
-    }
 
-    public BigDecimal getCommissionValue() {
-        return commissionValue;
-    }
-
-    public void setCommissionValue(BigDecimal commissionValue) {
-        this.commissionValue = commissionValue;
-    }
-
-    public String getCommissionType() {
-        return commissionType;
-    }
-
-    public void setCommissionType(String commissionType) {
-        this.commissionType = commissionType;
-    }
 }

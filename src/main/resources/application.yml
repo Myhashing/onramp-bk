@@ -1,6 +1,8 @@
 spring:
   application:
     name: onramp
+  main:
+    allow-bean-definition-overriding: true
   datasource:
     url: jdbc:mysql://localhost:3306/onramper
     username: root
@@ -118,3 +120,7 @@ market:
   rsi:
     overbought: 70
     oversold: 30
+
+default:
+  systemFee: 0.01
+  transactionFee: 4.0

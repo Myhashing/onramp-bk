@@ -42,8 +42,6 @@ public class OrderService {
         order.setExchangeRate(exchangeRate);
         order.setFees(fees);
         order.setStatus(OrderStatus.PENDING_PAYMENT);
-        order.setCreatedAt(new Timestamp(System.currentTimeMillis()));
-        order.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
 
         return orderRepository.save(order);
     }
@@ -55,7 +53,6 @@ public class OrderService {
     public void updateOrderStatus(UUID orderId, OrderStatus status) {
         Order order = getOrder(orderId);
         order.setStatus(status);
-        order.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
         orderRepository.save(order);
     }
 

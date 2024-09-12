@@ -1,5 +1,6 @@
 package com.amanatpay.onramp.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.validation.constraints.DecimalMin;
@@ -8,10 +9,12 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @Entity
 @Data
-public class RateBooking {
+public class RateBooking extends Auditable {
 
     @Id
     private String rateBookingId;
@@ -29,4 +32,6 @@ public class RateBooking {
 
     @NotBlank(message = "Business ID is required")
     private String businessId;
+
+
 }

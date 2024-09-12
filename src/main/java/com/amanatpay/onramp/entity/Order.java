@@ -10,7 +10,7 @@ import java.util.UUID;
 @Entity
 @Table(name = "`order`")
 @Data
-public class Order {
+public class Order extends Auditable {
 
     @Id
     @Column(name = "order_id", columnDefinition = "BINARY(16)")
@@ -19,8 +19,7 @@ public class Order {
     @Column(name = "business_id", columnDefinition = "BINARY(16)")
     private UUID businessId;
 
-    @Column(name = "created_at", nullable = false)
-    private Timestamp createdAt;
+
 
     @Column(name = "crypto_amount", nullable = false, precision = 38, scale = 2)
     private BigDecimal cryptoAmount;
@@ -41,8 +40,7 @@ public class Order {
     @Column(name = "status", nullable = false)
     private OrderStatus status;
 
-    @Column(name = "updated_at", nullable = false)
-    private Timestamp updatedAt;
+
 
     @Column(name = "user_id", columnDefinition = "BINARY(16)")
     private UUID userId;

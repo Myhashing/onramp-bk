@@ -9,13 +9,14 @@ import jakarta.validation.constraints.Size;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 
+import java.sql.Timestamp;
 import java.util.UUID;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "businesses")
 @Data
-public class Business {
+public class Business extends Auditable {
 
     @Id
     private UUID id;
@@ -33,8 +34,5 @@ public class Business {
     @Column(name = "website_url")
     private String websiteUrl;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
 
-    // Getters and Setters
 }

@@ -1,11 +1,13 @@
 package com.amanatpay.onramp.service;
 
+import com.amanatpay.onramp.dto.FinalRate;
 import com.amanatpay.onramp.entity.PartnerBusiness;
 import com.amanatpay.onramp.repository.PartnerBusinessRepository;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.Map;
 
@@ -27,6 +29,8 @@ public class PriceCalculationService {
 
     private final NobitexService nobitexService;
     private final PartnerBusinessRepository partnerBusinessRepository;
+    private final SpreadService spreadService;
+    private final TransactionsSettingDataService transactionsSettingDataService;
 
     /**
      * Constructor for the PriceCalculationService class.
@@ -36,9 +40,11 @@ public class PriceCalculationService {
      * @param nobitexService the NobitexService instance
      * @param partnerBusinessRepository the PartnerBusinessRepository instance
      */
-    public PriceCalculationService(NobitexService nobitexService, PartnerBusinessRepository partnerBusinessRepository) {
+    public PriceCalculationService(NobitexService nobitexService, PartnerBusinessRepository partnerBusinessRepository, SpreadService spreadService, TransactionsSettingDataService transactionsSettingDataService) {
         this.nobitexService = nobitexService;
         this.partnerBusinessRepository = partnerBusinessRepository;
+        this.spreadService = spreadService;
+        this.transactionsSettingDataService = transactionsSettingDataService;
     }
 
     /**
@@ -140,14 +146,14 @@ public class PriceCalculationService {
     public BigDecimal calculateWAPByAmount(BigDecimal amount) {
         // Retrieve order book data from the database
         Map<String, Object> orderBook = nobitexService.getOrderBook();
-        List<List<String>> asks = castToListOfLists(orderBook.get("asks"));
+        List<List<String>> bids = castToListOfLists(orderBook.get("bids"));
 
         BigDecimal totalVolume = BigDecimal.ZERO;
         BigDecimal weightedSum = BigDecimal.ZERO;
 
-        for (List<String> ask : asks) {
-            BigDecimal price = new BigDecimal(ask.get(0));
-            BigDecimal volume = new BigDecimal(ask.get(1));
+        for (List<String> bid : bids) {
+            BigDecimal price = new BigDecimal(bid.get(0));
+            BigDecimal volume = new BigDecimal(bid.get(1));
 
             if (totalVolume.add(volume).compareTo(amount) >= 0) {
                 BigDecimal remainingVolume = amount.subtract(totalVolume);
@@ -165,5 +171,38 @@ public class PriceCalculationService {
         }
 
         return weightedSum.divide(totalVolume, MathContext.DECIMAL64);
+    }
+
+    public FinalRate calculateFinalRate(Long businessId, BigDecimal amount, BigDecimal defaultSystemFee, double defaultTransactionFee) {
+        BigDecimal wap = calculateWAPByAmount(amount);
+        BigDecimal rateWithSpread = spreadService.applyDynamicSpread(wap);
+        BigDecimal finalRate = applyCommission(rateWithSpread, businessId);
+        finalRate = finalRate.setScale(2, RoundingMode.UP);
+
+        // Retrieve system fee from database or use default value
+        BigDecimal systemFeePercentage = transactionsSettingDataService.findSettingValueByName("systemFee")
+                .map(BigDecimal::new)
+                .orElse(defaultSystemFee);
+
+        BigDecimal systemFee = amount.multiply(systemFeePercentage);
+
+        // Retrieve transaction fee from database or use default value
+        BigDecimal transactionFee = transactionsSettingDataService.findSettingValueByName("transactionFee")
+                .map(BigDecimal::new)
+                .orElse(BigDecimal.valueOf(defaultTransactionFee));
+
+        // Calculate the total amount the user will pay in IRT (Toman)
+        //amount * finalRate + systemFee * finalRate IN TOMAN
+        BigDecimal totalAmount = amount.multiply(finalRate).add(systemFee.multiply(finalRate));
+
+
+        FinalRate finalRateDto = new FinalRate();
+        finalRateDto.setRate(finalRate);
+        finalRateDto.setSystemFee(systemFee);
+        finalRateDto.setTransactionFee(transactionFee);
+        finalRateDto.setTotalAmount(totalAmount);
+        finalRateDto.setUsdtAmount(amount.subtract(transactionFee));
+
+        return finalRateDto;
     }
 }

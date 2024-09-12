@@ -4,7 +4,8 @@ spring:
   datasource:
     url: jdbc:mysql://localhost:3306/onramper
     username: root
-    password: my-secret-pw
+    password: your_root_password
+
   jpa:
     hibernate:
       ddl-auto: update
@@ -32,11 +33,13 @@ spring:
             user-info-uri: http://localhost:9011/oauth2/userinfo
             jwk-set-uri: http://localhost:9011/.well-known/jwks.json
             user-name-attribute: sub
+
   data:
     redis:
       host: localhost
-      port: 6379
-      password: yourpassword
+      port: 6380
+      password: your_secure_password
+
 
 encryption:
   password: b684cc8de26de8ea4e363acc7d1e019622bf6d7795cd5e5d5ba33d147219cf2b
@@ -63,7 +66,7 @@ fusionauth:
 
 nobitex:
   api:
-    base-url: https://api.nobitex.ir
+    base-url: https://api.nobitex.ir/v2
 
 logging:
   file:
@@ -75,6 +78,7 @@ logging:
     com.onramp.service: DEBUG
     org.springframework.security: DEBUG
     org.springframework.web: DEBUG
+    org.springframework.data.redis: DEBUG
 
 elastic:
   apm:
@@ -101,3 +105,16 @@ management:
         enabled: true
         host: http://localhost:9201  # Elasticsearch URL
         index: metrics-onramp  # Customize the index name
+
+
+spread:
+  base: 2000
+
+market:
+  volatility:
+    threshold: 0.05
+  atr:
+    threshold: 0.05
+  rsi:
+    overbought: 70
+    oversold: 30

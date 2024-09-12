@@ -1,8 +1,10 @@
 package com.amanatpay.onramp.entity;
 
 import jakarta.persistence.*;
+
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.UUID;
 
@@ -13,8 +15,15 @@ public class TradeData {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-    @Column(columnDefinition = "TEXT")
-    private String data;
+    private long time;
+
+    private BigDecimal price;
+
+    private BigDecimal volume;
+
+    private String type;
+
+    private String currency;
 
     private Timestamp timestamp;
 }

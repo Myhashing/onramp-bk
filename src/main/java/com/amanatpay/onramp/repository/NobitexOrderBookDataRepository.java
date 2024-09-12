@@ -9,5 +9,6 @@ import java.util.UUID;
 
 @Repository
 public interface NobitexOrderBookDataRepository extends JpaRepository<NobitexOrderBookData, UUID> {
+
     Optional<NobitexOrderBookData> findTopByOrderByTimestampDesc();
 }

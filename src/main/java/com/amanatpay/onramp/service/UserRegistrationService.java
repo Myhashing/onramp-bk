@@ -1,9 +1,12 @@
 package com.amanatpay.onramp.service;
 
+import com.amanatpay.onramp.dto.ApiResponse;
 import com.amanatpay.onramp.dto.SubUserRegistrationRequest;
 import com.amanatpay.onramp.dto.UserRegistrationRequest;
-import com.amanatpay.onramp.dto.ApiResponse;
 import io.fusionauth.client.FusionAuthClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -12,9 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -23,26 +24,19 @@ import java.util.Objects;
 public class UserRegistrationService {
 
     private static final Logger logger = LoggerFactory.getLogger(UserRegistrationService.class);
-
+    private final Map<String, Map<String, String>> registrationDataStore = new HashMap<>();
     @Value("${fusionauth.application_id}")
     private String applicationId;
-
     @Value("${fusionauth.bearer_token}")
     private String bearerToken;
-
     @Value("${fusionauth.registration_url}")
     private String registrationUrl;
-
     @Autowired
     private RestTemplate restTemplate;
-
     @Autowired
     private OtpService otpService;
-
     @Autowired
     private FusionAuthClient fusionAuthClient;
-
-    private final Map<String, Map<String, String>> registrationDataStore = new HashMap<>();
 
     public ApiResponse<String> sendOtp(UserRegistrationRequest request, String ipAddress, String userAgent) {
         Objects.requireNonNull(request.getMobilePhone(), "Mobile phone is required");
@@ -123,7 +117,7 @@ public class UserRegistrationService {
     }
 
 
-     public ApiResponse<Map> registerSubUser(SubUserRegistrationRequest request) {
+    public ApiResponse<Map> registerSubUser(SubUserRegistrationRequest request) {
         // Register the sub-user in FusionAuth
         Map<String, Object> user = new HashMap<>();
         user.put("password", request.getUserPassword());
@@ -140,7 +134,7 @@ public class UserRegistrationService {
             user.put("roles", new String[]{"CORPORATE_USER"});
         }
 
-                // Set default KYC values
+        // Set default KYC values
         Map<String, Object> kycData = new HashMap<>();
         kycData.put("mobileVerified", false);
         kycData.put("emailVerified", false);

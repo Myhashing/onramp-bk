@@ -2,12 +2,12 @@ package com.amanatpay.onramp.controller;
 
 import com.amanatpay.onramp.dto.KycUpdateRequest;
 import com.amanatpay.onramp.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.validation.Valid;
 import java.util.UUID;
 
 @RestController

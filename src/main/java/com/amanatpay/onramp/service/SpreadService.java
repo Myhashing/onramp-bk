@@ -18,13 +18,10 @@ import java.util.Map;
 public class SpreadService {
 
     private final NobitexService nobitexService;
-
+    private final TradeDataService tradeDataService;
+    private final MarketAnalysisService marketAnalysisService;
     @Value("${spread.base}")
     private BigDecimal baseSpreadDefault;
-
-    private final TradeDataService tradeDataService;
-
-    private final MarketAnalysisService marketAnalysisService;
 
 
     /**
@@ -55,7 +52,7 @@ public class SpreadService {
         List<List<String>> asks = (List<List<String>>) orderBook.get("asks");
 
         // Get recent trade history data
-        List<TradeData> trades =  tradeDataService.getLatestTradeData();
+        List<TradeData> trades = tradeDataService.getLatestTradeData();
         // Calculate market volatility
         BigDecimal volatility = calculateVolatility(trades);
 

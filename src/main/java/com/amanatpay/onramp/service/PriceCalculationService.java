@@ -22,7 +22,6 @@ import java.util.Map;
  * The class also provides a method to calculate the WAP based on the amount to be exchanged.
  * The WAP is calculated based on the top asks until the total volume is equal to or greater than the amount.
  * The rate is then calculated as the weighted sum divided by the total volume.
- *
  */
 @Service
 public class PriceCalculationService {
@@ -36,8 +35,7 @@ public class PriceCalculationService {
      * Constructor for the PriceCalculationService class.
      * The NobitexService and PartnerBusinessRepository instances are injected via constructor injection.
      *
-     *
-     * @param nobitexService the NobitexService instance
+     * @param nobitexService            the NobitexService instance
      * @param partnerBusinessRepository the PartnerBusinessRepository instance
      */
     public PriceCalculationService(NobitexService nobitexService, PartnerBusinessRepository partnerBusinessRepository, SpreadService spreadService, TransactionsSettingDataService transactionsSettingDataService) {
@@ -51,7 +49,6 @@ public class PriceCalculationService {
      * Calculate the weighted average price (WAP) based on the top 3 bids and asks.
      * The WAP is calculated as the sum of the product of price and volume for the top 3 bids and asks,
      * divided by the total volume of the top 3 bids and asks.
-     *
      *
      * @return the weighted average price
      */
@@ -81,21 +78,18 @@ public class PriceCalculationService {
             weightedSum = weightedSum.add(price.multiply(volume));
         }
 
-        return weightedSum.divide(totalVolume, BigDecimal.ROUND_HALF_UP);
+        return weightedSum.divide(totalVolume, RoundingMode.HALF_UP);
     }
 
     /**
      * Cast the object to a List of Lists of Strings.
      * If the object is not an instance of List or the inner elements are not Lists, a ClassCastException is thrown.
      *
-     *
-     *
      * @param obj the object to cast
      * @return the object cast to a List of Lists of Strings
      */
     private List<List<String>> castToListOfLists(Object obj) {
-        if (obj instanceof List) {
-            List<?> list = (List<?>) obj;
+        if (obj instanceof List<?> list) {
             if (!list.isEmpty() && list.get(0) instanceof List) {
                 return (List<List<String>>) list;
             } else {
@@ -113,8 +107,7 @@ public class PriceCalculationService {
      * If the commission type is percentage, the rate is increased by the commission percentage.
      * If the commission type is fixed, the rate is increased by the fixed commission value.
      *
-     *
-     * @param rate the rate to apply commission to
+     * @param rate       the rate to apply commission to
      * @param businessId the ID of the business
      * @return the rate with commission applied
      */
@@ -138,7 +131,6 @@ public class PriceCalculationService {
      * The WAP is calculated as the sum of the product of price and volume for the top asks,
      * until the total volume is equal to or greater than the amount to be exchanged.
      * The WAP is then calculated as the weighted sum divided by the total volume.
-     *
      *
      * @param amount the amount to be exchanged
      * @return the weighted average price based on the amount

@@ -1,6 +1,5 @@
 package com.amanatpay.onramp.service;
 
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -33,7 +32,7 @@ public class MarketMonitoringService {
 
         List<BigDecimal> lows = tradeDataService.getMarketLowByCurrencyAndTimeRange("USDTIRT", System.currentTimeMillis() - 30L * 24 * 60 * 60 * 1000, System.currentTimeMillis());
         List<BigDecimal> highs = tradeDataService.getMarketHighByCurrencyAndTimeRange("USDTIRT", System.currentTimeMillis() - 30L * 24 * 60 * 60 * 1000, System.currentTimeMillis());
-    // Calculate gains and losses
+        // Calculate gains and losses
         BigDecimal gains = tradeDataService.calculateMarketGains("USDTIRT", System.currentTimeMillis() - 30L * 24 * 60 * 60 * 1000, System.currentTimeMillis());
         BigDecimal losses = gains.compareTo(BigDecimal.ZERO) < 0 ? gains.abs() : BigDecimal.ZERO;
         gains = gains.compareTo(BigDecimal.ZERO) > 0 ? gains : BigDecimal.ZERO;
@@ -58,8 +57,6 @@ public class MarketMonitoringService {
         // Check for large price movement
         marketAnalysisService.checkATR(atr);
     }
-
-
 
 
 }

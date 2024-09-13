@@ -4,9 +4,8 @@ import com.amanatpay.onramp.dto.BusinessRegistrationRequest;
 import com.amanatpay.onramp.entity.Business;
 import com.amanatpay.onramp.repository.BusinessRepository;
 import io.fusionauth.client.FusionAuthClient;
-import io.fusionauth.domain.api.UserRequest;
 import io.fusionauth.domain.User;
-import io.fusionauth.domain.UserRegistration;
+import io.fusionauth.domain.api.UserRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

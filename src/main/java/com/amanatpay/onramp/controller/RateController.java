@@ -2,22 +2,18 @@ package com.amanatpay.onramp.controller;
 
 import com.amanatpay.onramp.dto.ApiResponse;
 import com.amanatpay.onramp.dto.FinalRate;
-import com.amanatpay.onramp.entity.OrderBookData;
 import com.amanatpay.onramp.service.PriceCalculationService;
-import com.amanatpay.onramp.service.RateLockService;
-import com.amanatpay.onramp.repository.OrderBookDataRepository;
 import com.amanatpay.onramp.service.SpreadService;
 import com.amanatpay.onramp.service.TransactionsSettingDataService;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.Map;
 
 @RestController
@@ -52,12 +48,12 @@ public class RateController {
     }
 
     @GetMapping("/final")
-public ApiResponse<FinalRate> getRateFinal(@RequestParam @NotNull Long businessId, @RequestParam @NotNull BigDecimal amount) {
-    try {
-        FinalRate finalRate = priceCalculationService.calculateFinalRate(businessId, amount, defaultSystemFee, defaultTransactionFee);
-        return new ApiResponse<>(200, "OK", finalRate, null);
-    } catch (Exception e) {
-        return new ApiResponse<>(500, "Failed to retrieve rate: " + e.getMessage(), null, e.getMessage());
+    public ApiResponse<FinalRate> getRateFinal(@RequestParam @NotNull Long businessId, @RequestParam @NotNull BigDecimal amount) {
+        try {
+            FinalRate finalRate = priceCalculationService.calculateFinalRate(businessId, amount, defaultSystemFee, defaultTransactionFee);
+            return new ApiResponse<>(200, "OK", finalRate, null);
+        } catch (Exception e) {
+            return new ApiResponse<>(500, "Failed to retrieve rate: " + e.getMessage(), null, e.getMessage());
+        }
     }
-}
 }

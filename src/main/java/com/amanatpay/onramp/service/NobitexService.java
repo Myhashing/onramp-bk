@@ -7,7 +7,6 @@ import com.amanatpay.onramp.repository.NobitexOrderBookDataRepository;
 import com.amanatpay.onramp.repository.TradeDataRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.validation.constraints.NotBlank;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -28,7 +27,6 @@ import java.util.UUID;
  * It also provides methods to retrieve the latest order book and trade data.
  * The data is fetched every 2 seconds using a scheduled task.
  * The fetched data is stored in the database using the NobitexOrderBookData and TradeData entities.
- *
  */
 @Service
 public class NobitexService {
@@ -45,10 +43,10 @@ public class NobitexService {
     /**
      * Constructs a new NobitexService with the specified RestTemplate, NobitexOrderBookDataRepository, TradeDataRepository, and ObjectMapper.
      *
-     * @param restTemplate the RestTemplate to be used by this NobitexService
+     * @param restTemplate                   the RestTemplate to be used by this NobitexService
      * @param nobitexOrderBookDataRepository the NobitexOrderBookDataRepository to be used by this NobitexService
-     * @param tradeDataRepository the TradeDataRepository to be used by this NobitexService
-     * @param objectMapper the ObjectMapper to be used by this NobitexService
+     * @param tradeDataRepository            the TradeDataRepository to be used by this NobitexService
+     * @param objectMapper                   the ObjectMapper to be used by this NobitexService
      */
     public NobitexService(RestTemplate restTemplate, NobitexOrderBookDataRepository nobitexOrderBookDataRepository, TradeDataRepository tradeDataRepository, ObjectMapper objectMapper) {
         this.restTemplate = restTemplate;
@@ -77,7 +75,7 @@ public class NobitexService {
      * The data is stored in the nobitex_order_book_data table.
      */
     public void fetchOrderBook() {
-        String url = nobitexApiUrl+ "/orderbook/USDTIRT";
+        String url = nobitexApiUrl + "/orderbook/USDTIRT";
         Map<String, Object> orderBook = restTemplate.getForObject(url, Map.class);
 
         try {
@@ -98,20 +96,19 @@ public class NobitexService {
      * It fetches trade data from the Nobitex API and stores it in the database using the TradeData entity.
      * The fetched data is converted to JSON format before storing it in the database.
      * The timestamp of the data is set to the current time.
-     *
      */
     public void fetchTradeData() {
-    String url = nobitexApiUrl + "/trades/USDTIRT";
-    Map<String, Object> response = restTemplate.getForObject(url, Map.class);
+        String url = nobitexApiUrl + "/trades/USDTIRT";
+        Map<String, Object> response = restTemplate.getForObject(url, Map.class);
 
-    assert response != null;
-    if ("ok".equals(response.get("status"))) {
-        List<Map<String, Object>> trades = (List<Map<String, Object>>) response.get("trades");
-        for (Map<String, Object> trade : trades) {
-            long time = (long) trade.get("time");
-            BigDecimal price = new BigDecimal((String) trade.get("price"));
-            BigDecimal volume = new BigDecimal((String) trade.get("volume"));
-            String type = (String) trade.get("type");
+        assert response != null;
+        if ("ok".equals(response.get("status"))) {
+            List<Map<String, Object>> trades = (List<Map<String, Object>>) response.get("trades");
+            for (Map<String, Object> trade : trades) {
+                long time = (long) trade.get("time");
+                BigDecimal price = new BigDecimal((String) trade.get("price"));
+                BigDecimal volume = new BigDecimal((String) trade.get("volume"));
+                String type = (String) trade.get("type");
 
                 TradeData tradeDataEntity = new TradeData();
                 tradeDataEntity.setId(UUID.randomUUID());
@@ -123,11 +120,9 @@ public class NobitexService {
                 tradeDataEntity.setTimestamp(new Timestamp(System.currentTimeMillis()));
                 tradeDataRepository.save(tradeDataEntity);
 
+            }
         }
     }
-}
-
-
 
 
     /**

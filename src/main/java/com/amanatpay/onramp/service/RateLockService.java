@@ -10,10 +10,9 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class RateLockService {
 
+    private static final long RATE_LOCK_DURATION = 5; // 5 minutes
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
-
-    private static final long RATE_LOCK_DURATION = 5; // 5 minutes
 
     public void lockRate(String rateBookingId, BigDecimal rate) {
         redisTemplate.opsForValue().set(rateBookingId, rate, RATE_LOCK_DURATION, TimeUnit.MINUTES);

@@ -12,11 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class AuthService {
@@ -58,11 +54,11 @@ public class AuthService {
 
         try {
             ResponseEntity<Map> searchResponse = restTemplate.exchange(searchUrl, HttpMethod.POST, searchEntity, Map.class);
-            if (searchResponse.getStatusCode().value() != 200 || searchResponse.getBody() == null || ((Map) searchResponse.getBody()).get("users") == null) {
+            if (searchResponse.getStatusCode().value() != 200 || searchResponse.getBody() == null || searchResponse.getBody().get("users") == null) {
                 return new ApiResponse<>(searchResponse.getStatusCode().value(), "Error Searching User", null, searchResponse.getBody().toString());
             }
 
-            Map user = ((List<Map>) ((Map) searchResponse.getBody()).get("users")).get(0);
+            Map user = ((List<Map>) searchResponse.getBody().get("users")).get(0);
             String userId = (String) user.get("username");
 
             // Start passwordless login

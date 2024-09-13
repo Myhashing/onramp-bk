@@ -13,6 +13,7 @@ public class FusionAuthConfig {
 
     @Value("${fusionauth.base-url}")
     private String BASE_URL;
+
     @Bean
     public FusionAuthClient fusionAuthClient() {
         return new FusionAuthClient(API_KEY, BASE_URL);

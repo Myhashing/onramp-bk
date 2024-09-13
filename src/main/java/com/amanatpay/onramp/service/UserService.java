@@ -2,9 +2,9 @@ package com.amanatpay.onramp.service;
 
 import com.amanatpay.onramp.dto.KycUpdateRequest;
 import io.fusionauth.client.FusionAuthClient;
-import io.fusionauth.domain.api.UserResponse;
-import io.fusionauth.domain.api.UserRequest;
 import io.fusionauth.domain.User;
+import io.fusionauth.domain.api.UserRequest;
+import io.fusionauth.domain.api.UserResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -41,7 +41,7 @@ public class UserService {
     }
 
     public KycUpdateRequest getKyc(UUID userId) {
-    // Implement the logic to retrieve KYC information for the user
-    return new KycUpdateRequest();
+        // Implement the logic to retrieve KYC information for the user
+        return new KycUpdateRequest();
     }
 }

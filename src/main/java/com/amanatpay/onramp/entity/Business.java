@@ -1,17 +1,15 @@
 package com.amanatpay.onramp.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.Column;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 
-import java.sql.Timestamp;
 import java.util.UUID;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "businesses")

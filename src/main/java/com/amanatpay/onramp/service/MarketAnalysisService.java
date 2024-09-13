@@ -2,6 +2,7 @@ package com.amanatpay.onramp.service;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.List;
@@ -10,28 +11,24 @@ import java.util.Map;
 @Service
 public class MarketAnalysisService {
 
+    private final NotificationService notificationService;
     @Value("${market.volatility.threshold}")
     private BigDecimal volatilityThreshold;
-
     @Value("${market.atr.threshold}")
     private BigDecimal atrThreshold;
-
     @Value("${market.rsi.overbought}")
     private int rsiOverbought;
-
     @Value("${market.rsi.oversold}")
     private int rsiOversold;
-
-    private final NotificationService notificationService;
 
     public MarketAnalysisService(NotificationService notificationService) {
         this.notificationService = notificationService;
     }
 
     // Volatility Detection and Alerts
+
     /**
      * Calculate the standard deviation of a list of prices.
-     *
      *
      * @param prices the list of prices
      * @return the standard deviation
@@ -54,10 +51,8 @@ public class MarketAnalysisService {
     /**
      * Calculate the Average True Range (ATR) of a list of high and low prices.
      *
-     *
-     *
      * @param highs the list of high prices
-     * @param lows the list of low prices
+     * @param lows  the list of low prices
      * @return the Average True Range
      */
     public BigDecimal calculateATR(List<BigDecimal> highs, List<BigDecimal> lows) {
@@ -71,7 +66,6 @@ public class MarketAnalysisService {
     /**
      * Check if the Average True Range (ATR) exceeds the threshold.
      *
-     *
      * @param atr the Average True Range
      */
     public void checkVolatility(BigDecimal standardDeviation) {
@@ -82,7 +76,6 @@ public class MarketAnalysisService {
 
     /**
      * Check if the Average True Range (ATR) exceeds the threshold.
-     *
      *
      * @param atr the Average True Range
      */

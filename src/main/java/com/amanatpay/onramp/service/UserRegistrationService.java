@@ -1,7 +1,6 @@
 package com.amanatpay.onramp.service;
 
 import com.amanatpay.onramp.dto.ApiResponse;
-import com.amanatpay.onramp.dto.SubUserRegistrationRequest;
 import com.amanatpay.onramp.dto.UserRegistrationRequest;
 import io.fusionauth.client.FusionAuthClient;
 import org.slf4j.Logger;
@@ -117,6 +116,7 @@ public class UserRegistrationService {
     }
 
 
+/*
     public ApiResponse<Map> registerSubUser(SubUserRegistrationRequest request) {
         // Register the sub-user in FusionAuth
         Map<String, Object> user = new HashMap<>();
@@ -173,4 +173,5 @@ public class UserRegistrationService {
         }
 
     }
+*/
 }

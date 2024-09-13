@@ -1,13 +1,11 @@
 package com.amanatpay.onramp.controller;
 
 import com.amanatpay.onramp.dto.ApiResponse;
-import com.amanatpay.onramp.dto.SubUserRegistrationRequest;
 import com.amanatpay.onramp.dto.UserRegistrationRequest;
 import com.amanatpay.onramp.dto.VerifyOtpRequest;
 import com.amanatpay.onramp.service.UserRegistrationService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -31,9 +29,5 @@ public class UserRegistrationController {
         return userRegistrationService.registerUser(request.getMobilePhone(), request.getOtp());
     }
 
-    @PostMapping("/register-sub-user")
-    public ResponseEntity<String> registerSubUser(@Valid @RequestBody SubUserRegistrationRequest request) {
-        userRegistrationService.registerSubUser(request);
-        return ResponseEntity.ok("Sub-user registered successfully");
-    }
+
 }

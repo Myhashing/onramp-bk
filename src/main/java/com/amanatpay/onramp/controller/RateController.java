@@ -4,7 +4,6 @@ import com.amanatpay.onramp.dto.ApiResponse;
 import com.amanatpay.onramp.dto.FinalRate;
 import com.amanatpay.onramp.service.PriceCalculationService;
 import com.amanatpay.onramp.service.SpreadService;
-import com.amanatpay.onramp.service.TransactionsSettingDataService;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,8 +25,6 @@ public class RateController {
     @Autowired
     private SpreadService spreadService;
 
-    @Autowired
-    private TransactionsSettingDataService transactionsSettingDataService;
 
     @Value("${default.systemFee}")
     private BigDecimal defaultSystemFee;

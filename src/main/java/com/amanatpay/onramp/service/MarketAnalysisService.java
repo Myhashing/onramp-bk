@@ -1,5 +1,7 @@
 package com.amanatpay.onramp.service;
 
+import com.amanatpay.onramp.dto.AlertCategory;
+import com.amanatpay.onramp.dto.AlertLevel;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -44,7 +46,7 @@ public class MarketAnalysisService {
 
     public void checkStandardDeviation(BigDecimal standardDeviation) {
         if (standardDeviation.compareTo(volatilityThreshold) > 0) {
-            notificationService.alertAdmin("High volatility detected");
+            notificationService.alertAdmin("High volatility detected", AlertLevel.HIGH, AlertCategory.FINANCE);
         }
     }
 
@@ -70,7 +72,7 @@ public class MarketAnalysisService {
      */
     public void checkVolatility(BigDecimal standardDeviation) {
         if (standardDeviation.compareTo(volatilityThreshold) > 0) {
-            notificationService.alertAdmin("High volatility detected");
+            notificationService.alertAdmin("High volatility detected", AlertLevel.HIGH, AlertCategory.FINANCE);
         }
     }
 
@@ -81,7 +83,7 @@ public class MarketAnalysisService {
      */
     public void checkATR(BigDecimal atr) {
         if (atr.compareTo(atrThreshold) > 0) {
-            notificationService.alertAdmin("Large price movement detected");
+            notificationService.alertAdmin("Large price movement detected", AlertLevel.HIGH, AlertCategory.FINANCE);
         }
     }
 
@@ -109,9 +111,9 @@ public class MarketAnalysisService {
 
     public void checkRSI(BigDecimal rsi) {
         if (rsi.compareTo(BigDecimal.valueOf(rsiOverbought)) > 0) {
-            notificationService.alertAdmin("RSI indicates overbought conditions");
+            notificationService.alertAdmin("RSI indicates overbought conditions", AlertLevel.HIGH, AlertCategory.FINANCE);
         } else if (rsi.compareTo(BigDecimal.valueOf(rsiOversold)) < 0) {
-            notificationService.alertAdmin("RSI indicates oversold conditions");
+            notificationService.alertAdmin("RSI indicates oversold conditions", AlertLevel.HIGH, AlertCategory.FINANCE);
         }
     }
 
@@ -140,8 +142,4 @@ public class MarketAnalysisService {
 
     }
 
-    // Alerts and Notifications
-    public void sendAlert(String message) {
-        notificationService.alertAdmin(message);
-    }
 }

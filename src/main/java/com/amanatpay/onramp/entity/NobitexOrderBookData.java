@@ -2,10 +2,12 @@ package com.amanatpay.onramp.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.sql.Timestamp;
 import java.util.UUID;
 
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Data
 public class NobitexOrderBookData extends Auditable {

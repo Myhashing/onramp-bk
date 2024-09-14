@@ -6,7 +6,6 @@ import com.amanatpay.onramp.repository.BusinessRepository;
 import io.fusionauth.client.FusionAuthClient;
 import io.fusionauth.domain.User;
 import io.fusionauth.domain.api.UserRequest;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -14,11 +13,14 @@ import java.util.UUID;
 @Service
 public class BusinessService {
 
-    @Autowired
-    private BusinessRepository businessRepository;
+    private final BusinessRepository businessRepository;
 
-    @Autowired
-    private FusionAuthClient fusionAuthClient;
+    private final FusionAuthClient fusionAuthClient;
+
+    public BusinessService(BusinessRepository businessRepository, FusionAuthClient fusionAuthClient) {
+        this.businessRepository = businessRepository;
+        this.fusionAuthClient = fusionAuthClient;
+    }
 
     public Business registerBusiness(BusinessRegistrationRequest request) {
         // Create and save the business entity
@@ -45,4 +47,6 @@ public class BusinessService {
 
         return savedBusiness;
     }
+
+
 }

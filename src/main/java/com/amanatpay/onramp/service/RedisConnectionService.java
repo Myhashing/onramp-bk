@@ -7,8 +7,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class RedisConnectionService {
 
-    @Autowired
-    private RedisTemplate<String, String> redisTemplate;
+    private final RedisTemplate<String, String> redisTemplate;
+
+    public RedisConnectionService(RedisTemplate<String, String> redisTemplate) {
+        this.redisTemplate = redisTemplate;
+    }
 
     public String checkConnection() {
         try {

@@ -13,8 +13,11 @@ import java.util.UUID;
 @RequestMapping("/api/transactions-settings")
 public class TransactionsSettingDataController {
 
-    @Autowired
-    private TransactionsSettingDataService service;
+    private final TransactionsSettingDataService service;
+
+    public TransactionsSettingDataController(TransactionsSettingDataService service) {
+        this.service = service;
+    }
 
     @GetMapping
     public List<TransactionsSettingData> getAllSettings() {

@@ -124,3 +124,5 @@ market:
 default:
   systemFee: 0.01
   transactionFee: 4.0
+  redirectBaseUrl: https://www.amanatpay.com/redirect/booking/
+  numberOfAllowedBookingDuplicates: 3

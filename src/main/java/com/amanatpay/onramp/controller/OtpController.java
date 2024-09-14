@@ -14,11 +14,14 @@ import java.util.Map;
 @RestController
 public class OtpController {
 
-    @Autowired
-    private OtpService otpService;
+    private final OtpService otpService;
 
-    @Autowired
-    private AuthService authService;
+    private final AuthService authService;
+
+    public OtpController(OtpService otpService, AuthService authService) {
+        this.otpService = otpService;
+        this.authService = authService;
+    }
 
     @PostMapping("/sendOtp")
     public ApiResponse<Map<String, Object>> sendOtp(@RequestBody Map<String, String> requestBody,

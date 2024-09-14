@@ -14,8 +14,11 @@ import java.util.Map;
 @RequestMapping("/register")
 public class UserRegistrationController {
 
-    @Autowired
-    private UserRegistrationService userRegistrationService;
+    private final UserRegistrationService userRegistrationService;
+
+    public UserRegistrationController(UserRegistrationService userRegistrationService) {
+        this.userRegistrationService = userRegistrationService;
+    }
 
     @PostMapping("/otp")
     public ApiResponse<String> generateOtp(@Valid @RequestBody UserRegistrationRequest request,

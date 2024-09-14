@@ -32,11 +32,8 @@ public class AuthService {
     @Value("${fusionauth.bearer_token}")
     private String bearerToken;
 
-    @Autowired
-    private UserProfileRepository userProfileRepository;
-
-    @Autowired
-    private EncryptionUtil encryptionUtil;
+    public AuthService(UserProfileRepository userProfileRepository, EncryptionUtil encryptionUtil) {
+    }
 
     public ApiResponse<Map<String, Object>> authenticate(String mobileNumber, String ipAddress, String userAgent) {
         // Search for the user by mobile number

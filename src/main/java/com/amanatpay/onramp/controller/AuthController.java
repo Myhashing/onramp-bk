@@ -15,8 +15,11 @@ import java.util.Map;
 @RestController
 public class AuthController {
 
-    @Autowired
-    private LoginService loginService;
+    private final LoginService loginService;
+
+    public AuthController(LoginService loginService) {
+        this.loginService = loginService;
+    }
 
     @PostMapping("/login")
     public ApiResponse<Map<String, Object>> login(@RequestParam String username, @RequestParam String password) {

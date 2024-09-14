@@ -28,8 +28,11 @@ public class OtpService {
     private final Map<String, Bucket> rateLimiters = new ConcurrentHashMap<>();
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
-    @Autowired
-    private EncryptionUtil encryptionUtil;
+    private final EncryptionUtil encryptionUtil;
+
+    public OtpService(EncryptionUtil encryptionUtil) {
+        this.encryptionUtil = encryptionUtil;
+    }
 
     public ApiResponse<Map<String, Object>> sendOtp(String mobileNumber, String ipAddress, String userAgent) {
         Bucket bucket = rateLimiters.computeIfAbsent(mobileNumber, k -> Bucket4j.builder()

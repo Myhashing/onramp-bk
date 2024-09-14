@@ -30,12 +30,15 @@ public class UserRegistrationService {
     private String bearerToken;
     @Value("${fusionauth.registration_url}")
     private String registrationUrl;
-    @Autowired
-    private RestTemplate restTemplate;
-    @Autowired
-    private OtpService otpService;
-    @Autowired
-    private FusionAuthClient fusionAuthClient;
+    private final RestTemplate restTemplate;
+    private final OtpService otpService;
+    private final FusionAuthClient fusionAuthClient;
+
+    public UserRegistrationService(RestTemplate restTemplate, OtpService otpService, FusionAuthClient fusionAuthClient) {
+        this.restTemplate = restTemplate;
+        this.otpService = otpService;
+        this.fusionAuthClient = fusionAuthClient;
+    }
 
     public ApiResponse<String> sendOtp(UserRegistrationRequest request, String ipAddress, String userAgent) {
         Objects.requireNonNull(request.getMobilePhone(), "Mobile phone is required");

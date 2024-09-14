@@ -1,12 +1,17 @@
 package com.amanatpay.onramp.service;
 
+import com.amanatpay.onramp.dto.AlertCategory;
+import com.amanatpay.onramp.dto.AlertLevel;
 import com.amanatpay.onramp.dto.NobitexResponse;
 import com.amanatpay.onramp.entity.NobitexOrderBookData;
 import com.amanatpay.onramp.entity.TradeData;
+import com.amanatpay.onramp.exception.DataUnavailableException;
 import com.amanatpay.onramp.repository.NobitexOrderBookDataRepository;
 import com.amanatpay.onramp.repository.TradeDataRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -35,6 +40,7 @@ public class NobitexService {
     private final NobitexOrderBookDataRepository nobitexOrderBookDataRepository;
     private final TradeDataRepository tradeDataRepository;
     private final ObjectMapper objectMapper;
+    private static final Logger logger = LoggerFactory.getLogger(NobitexService.class);
 
     @Value("${nobitex.api.base-url}")
     private String nobitexApiUrl;
@@ -75,10 +81,13 @@ public class NobitexService {
      * The data is stored in the nobitex_order_book_data table.
      */
     public void fetchOrderBook() {
+    try {
         String url = nobitexApiUrl + "/orderbook/USDTIRT";
         Map<String, Object> orderBook = restTemplate.getForObject(url, Map.class);
+        if (orderBook == null) {
+            throw new DataUnavailableException("Order book data is unavailable from Nobitex.");
+        }
 
-        try {
             String jsonData = objectMapper.writeValueAsString(orderBook);
             NobitexOrderBookData nobitexOrderBookData = new NobitexOrderBookData();
             nobitexOrderBookData.setId(UUID.randomUUID());
@@ -86,7 +95,16 @@ public class NobitexService {
             nobitexOrderBookData.setTimestamp(new Timestamp(System.currentTimeMillis()));
             nobitexOrderBookDataRepository.save(nobitexOrderBookData);
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            // Log the exception
+            logger.error("An error occurred while fetching order book data", e);
+
+            // Alert the admin
+            NotificationService.alertAdmin("NobitexService is offline due to an error: " + e.getMessage(), AlertLevel.HIGH, AlertCategory.ExternalService);
+
+            // Stop the system from giving rates
+            SystemAdminService.stopSystem();
+
+            throw new DataUnavailableException("Order book data is unavailable from Nobitex.");
         }
     }
 
@@ -98,30 +116,46 @@ public class NobitexService {
      * The timestamp of the data is set to the current time.
      */
     public void fetchTradeData() {
-        String url = nobitexApiUrl + "/trades/USDTIRT";
-        Map<String, Object> response = restTemplate.getForObject(url, Map.class);
+        try {
+            String url = nobitexApiUrl + "/trades/USDTIRT";
+            Map<String, Object> response = restTemplate.getForObject(url, Map.class);
 
-        assert response != null;
-        if ("ok".equals(response.get("status"))) {
-            List<Map<String, Object>> trades = (List<Map<String, Object>>) response.get("trades");
-            for (Map<String, Object> trade : trades) {
-                long time = (long) trade.get("time");
-                BigDecimal price = new BigDecimal((String) trade.get("price"));
-                BigDecimal volume = new BigDecimal((String) trade.get("volume"));
-                String type = (String) trade.get("type");
+            assert response != null;
+            if ("ok".equals(response.get("status"))) {
+                List<Map<String, Object>> trades = (List<Map<String, Object>>) response.get("trades");
+                for (Map<String, Object> trade : trades) {
+                    long time = (long) trade.get("time");
+                    BigDecimal price = new BigDecimal((String) trade.get("price"));
+                    BigDecimal volume = new BigDecimal((String) trade.get("volume"));
+                    String type = (String) trade.get("type");
 
-                TradeData tradeDataEntity = new TradeData();
-                tradeDataEntity.setId(UUID.randomUUID());
-                tradeDataEntity.setTime(time);
-                tradeDataEntity.setPrice(price);
-                tradeDataEntity.setVolume(volume);
-                tradeDataEntity.setType(type);
-                tradeDataEntity.setCurrency("USDTIRT");
-                tradeDataEntity.setTimestamp(new Timestamp(System.currentTimeMillis()));
-                tradeDataRepository.save(tradeDataEntity);
+                    TradeData tradeDataEntity = new TradeData();
+                    tradeDataEntity.setId(UUID.randomUUID());
+                    tradeDataEntity.setTime(time);
+                    tradeDataEntity.setPrice(price);
+                    tradeDataEntity.setVolume(volume);
+                    tradeDataEntity.setType(type);
+                    tradeDataEntity.setCurrency("USDTIRT");
+                    tradeDataEntity.setTimestamp(new Timestamp(System.currentTimeMillis()));
+                    tradeDataRepository.save(tradeDataEntity);
 
+                }
+            } else {
+                throw new DataUnavailableException("Order book data is unavailable from Nobitex.");
             }
+        } catch (Exception e) {
+            // Log the exception
+            logger.error("An error occurred while fetching trade data", e);
+
+            // Alert the admin
+            NotificationService.alertAdmin("NobitexService is offline due to an error: " + e.getMessage(), AlertLevel.HIGH, AlertCategory.ExternalService);
+
+                // Stop the system from giving rates
+            SystemAdminService.stopSystem();
+
+            throw new DataUnavailableException("Order book data is unavailable from Nobitex.");
         }
+
     }
 
 
@@ -141,26 +175,48 @@ public class NobitexService {
                 // Convert JSON string back to Map
                 return objectMapper.readValue(jsonData, Map.class);
             } catch (JsonProcessingException e) {
-                e.printStackTrace();
+                // Log the exception
+                logger.error("An error occurred while parsing order book data", e);
+
+                // Alert the admin
+                NotificationService.alertAdmin("NobitexService is offline due to an error: " + e.getMessage(), AlertLevel.HIGH, AlertCategory.ExternalService);
+
+                // Stop the system from giving rates
+                SystemAdminService.stopSystem();
+
+                throw new DataUnavailableException("Order book data is unavailable from Nobitex.");
             }
         }
         return null;
     }
 
     public void processNobitexData(NobitexResponse response) {
-        if ("ok".equals(response.getStatus())) {
-            for (NobitexResponse.Trade trade : response.getTrades()) {
-                TradeData tradeData = new TradeData();
-                tradeData.setId(UUID.randomUUID());
-                tradeData.setTime(trade.getTime());
-                tradeData.setPrice(new BigDecimal(trade.getPrice()));
-                tradeData.setVolume(new BigDecimal(trade.getVolume()));
-                tradeData.setType(trade.getType());
-                tradeData.setCurrency("IRR"); // Set the currency as per your requirement
-                tradeData.setTimestamp(Timestamp.from(Instant.ofEpochMilli(trade.getTime())));
+        try {
+            if ("ok".equals(response.getStatus())) {
+                for (NobitexResponse.Trade trade : response.getTrades()) {
+                    TradeData tradeData = new TradeData();
+                    tradeData.setId(UUID.randomUUID());
+                    tradeData.setTime(trade.getTime());
+                    tradeData.setPrice(new BigDecimal(trade.getPrice()));
+                    tradeData.setVolume(new BigDecimal(trade.getVolume()));
+                    tradeData.setType(trade.getType());
+                    tradeData.setCurrency("IRR"); // Set the currency as per your requirement
+                    tradeData.setTimestamp(Timestamp.from(Instant.ofEpochMilli(trade.getTime())));
 
-                tradeDataRepository.save(tradeData);
+                    tradeDataRepository.save(tradeData);
+                }
             }
+        }catch (Exception e) {
+            // Log the exception
+            logger.error("An error occurred while processing Nobitex data", e);
+
+            // Alert the admin
+            NotificationService.alertAdmin("NobitexService is offline due to an error: " + e.getMessage(), AlertLevel.HIGH, AlertCategory.ExternalService);
+
+            // Stop the system from giving rates
+            SystemAdminService.stopSystem();
+
+            throw new DataUnavailableException("Order book data is unavailable from Nobitex.");
         }
     }
 

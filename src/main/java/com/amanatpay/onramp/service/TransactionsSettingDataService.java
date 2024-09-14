@@ -12,8 +12,11 @@ import java.util.UUID;
 @Service
 public class TransactionsSettingDataService {
 
-    @Autowired
-    private TransactionsSettingDataRepository repository;
+    private final TransactionsSettingDataRepository repository;
+
+    public TransactionsSettingDataService(TransactionsSettingDataRepository repository) {
+        this.repository = repository;
+    }
 
     public List<TransactionsSettingData> findAll() {
         return repository.findAll();

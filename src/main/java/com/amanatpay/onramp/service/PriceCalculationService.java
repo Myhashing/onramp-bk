@@ -165,6 +165,8 @@ public class PriceCalculationService {
         return weightedSum.divide(totalVolume, MathContext.DECIMAL64);
     }
 
+
+
     public FinalRate calculateFinalRate(Long businessId, BigDecimal amount, BigDecimal defaultSystemFee, double defaultTransactionFee) {
         BigDecimal wap = calculateWAPByAmount(amount);
         BigDecimal rateWithSpread = spreadService.applyDynamicSpread(wap);
@@ -197,4 +199,7 @@ public class PriceCalculationService {
 
         return finalRateDto;
     }
+
+
+
 }

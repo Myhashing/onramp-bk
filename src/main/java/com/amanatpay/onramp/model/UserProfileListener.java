@@ -10,8 +10,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class UserProfileListener {
 
-    @Autowired
-    private EncryptionUtil encryptionUtil;
+    private final EncryptionUtil encryptionUtil;
+
+    public UserProfileListener(EncryptionUtil encryptionUtil) {
+        this.encryptionUtil = encryptionUtil;
+    }
 
     @PrePersist
     @PreUpdate

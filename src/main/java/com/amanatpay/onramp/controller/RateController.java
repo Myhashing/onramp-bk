@@ -94,7 +94,20 @@ public class RateController {
      * @return ApiResponse containing the booking details or an error message.
      */
     @PostMapping("/book")
-    public ApiResponse<Map<String, Object>> bookRate(@RequestParam @NotNull Long businessId, @RequestParam @NotNull BigDecimal amount, @RequestParam @NotNull Long partnerUserId, @RequestParam @NotNull String mobileNumber, @RequestParam(required = false) String nationalCode, @RequestParam(required = false) String postcode, @RequestParam(required = false) String birthdate, @RequestParam(required = false) String email, @RequestParam(required = false) String bankCardNumber, @RequestParam(required = false) String iban, @RequestParam(required = false) MultipartFile kycImage) {
+    public ApiResponse<Map<String, Object>> bookRate(
+            @RequestParam @NotNull Long businessId,
+            @RequestParam @NotNull BigDecimal amount,
+            @RequestParam @NotNull Long partnerUserId,
+            @RequestParam @NotNull String mobileNumber,
+            @RequestParam @NotNull String walletAddress,
+            @RequestParam(required = false) String nationalCode,
+            @RequestParam(required = false) String postcode,
+            @RequestParam(required = false) String birthdate,
+            @RequestParam(required = false) String email,
+            @RequestParam(required = false) String bankCardNumber,
+            @RequestParam(required = false) String iban,
+            @RequestParam(required = false) MultipartFile kycImage
+    ) {
         try {
 
             // Apply filters
@@ -117,11 +130,17 @@ public class RateController {
             // Generate a unique booking ID
             String bookingId = UUID.randomUUID().toString();
 
-            // Create a new RateBooking object
-            RateBooking booking = new RateBooking(bookingId, partnerUserId, finalRate, amount, LocalDateTime.now().plusMinutes(5));
+            // Create a new RateBooking object bookingId, partnerUserId, finalRate, amount, LocalDateTime.now().plusMinutes(5)
+            RateBooking booking = new RateBooking();
 
+            booking.setBookingId(bookingId);
+            booking.setPartnerUserId(partnerUserId);
+            booking.setRate(finalRate);
+            booking.setAmount(amount);
+            booking.setExpirationTime(LocalDateTime.now().plusMinutes(5));
             booking.setMobileNumber(mobileNumber);
             booking.setBusinessId(businessId);
+            booking.setWalletAddress(walletAddress);
 
             // Lock the rate in Redis for 5 minutes
             redisService.lockRate(bookingId, booking, 5, TimeUnit.MINUTES);
@@ -148,6 +167,59 @@ public class RateController {
     }
 
 
+    /**
+     * Handles the cancellation of a rate booking.
+     *
+     * @param bookingId The unique identifier of the booking to be cancelled.
+     * @return ApiResponse containing a success message if the booking is cancelled successfully,
+     * or an error message if the cancellation fails.
+     */
+    @GetMapping("/cancel")
+    public ApiResponse<String> cancelBooking(@RequestParam @NotNull String bookingId) {
+        try {
+            // Expire the booking in Redis
+            rateBookingService.expireBookingIfNeeded(bookingId);
+            return new ApiResponse<>(200, "Booking cancelled successfully", null, null);
+        } catch (Exception e) {
+            return new ApiResponse<>(500, "Failed to cancel booking: " + e.getMessage(), null, e.getMessage());
+        }
+    }
+
+    /**
+     * Retrieves a rate booking from Redis and optionally saves it to the database.
+     *
+     * @param bookingId   The unique identifier of the booking to be retrieved.
+     * @param saveBooking A boolean flag indicating whether to save the booking to the database.
+     * @return ApiResponse containing the booking details if found, or an error message if not found or if an exception occurs.
+     */
+    @GetMapping("/retrieve")
+    public ApiResponse<Map<String, Object>> retrieveBooking(@RequestParam @NotNull String bookingId, @RequestParam @NotNull Boolean saveBooking) {
+        try {
+            // Retrieve the booking from Redis
+            RateBooking booking = redisService.getRateBooking(bookingId);
+            if (booking == null) {
+                return new ApiResponse<>(404, "Booking not found", null, null);
+            }
+            // Save the booking in the database if requested
+            if (saveBooking) {
+                rateBookingService.saveBooking(booking);
+            }
+            // Prepare the response data
+            Map<String, Object> response = new HashMap<>();
+            response.put("bookingId", booking.getBookingId());
+            response.put("rate", booking.getRate());
+            response.put("amount", booking.getAmount());
+            response.put("expiresAt", booking.getExpirationTime());
+            response.put("mobileNumber", booking.getMobileNumber());
+            response.put("walletAddress", booking.getWalletAddress());
+            response.put("businessId", booking.getBusinessId());
+            // Return a successful response
+            return new ApiResponse<>(200, "Booking retrieved successfully", response, null);
+        } catch (Exception e) {
+            // Return an error response in case of an exception
+            return new ApiResponse<>(500, "Failed to retrieve booking: " + e.getMessage(), null, e.getMessage());
+        }
+    }
 
 }
 

@@ -10,7 +10,7 @@ import java.util.UUID;
 
 @Entity
 @Data
-public class Notification {
+public class Notification extends Auditable{
 
     @Id
     @GeneratedValue

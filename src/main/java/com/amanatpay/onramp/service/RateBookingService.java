@@ -1,11 +1,14 @@
 package com.amanatpay.onramp.service;
 
 import com.amanatpay.onramp.dto.RateBooking;
+import com.amanatpay.onramp.entity.TempSaveBooking;
 import com.amanatpay.onramp.entity.TemporaryUserData;
 import com.amanatpay.onramp.exception.BookingExpiredException;
+import com.amanatpay.onramp.repository.TempSaveBookingRepository;
 import com.amanatpay.onramp.repository.TemporaryUserDataRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
 import java.io.IOException;
 import java.time.LocalDateTime;
 
@@ -16,11 +19,13 @@ public class RateBookingService {
 
     private final TemporaryUserDataRepository temporaryUserDataRepository;
     private final KycService kycService;
+    private final TempSaveBookingRepository tempSaveBookingRepository;
 
-    public RateBookingService(RedisService redisService, TemporaryUserDataRepository temporaryUserDataRepository, KycService kycService) {
+    public RateBookingService(RedisService redisService, TemporaryUserDataRepository temporaryUserDataRepository, KycService kycService, TempSaveBookingRepository tempSaveBookingRepository) {
         this.redisService = redisService;
         this.temporaryUserDataRepository = temporaryUserDataRepository;
         this.kycService = kycService;
+        this.tempSaveBookingRepository = tempSaveBookingRepository;
     }
 
     public void expireBookingIfNeeded(String bookingId) {
@@ -90,6 +95,25 @@ public class RateBookingService {
         String compositeKey = mobileNumber + ":" + BusinessId;
         return redisService.isBookingValidNumberOfTimes(null, compositeKey);
     }
+
+
+/**
+ * Saves a rate booking to the temporary booking repository.
+ *
+ * @param booking The RateBooking object containing the booking details to be saved.
+ */
+public void saveBooking(RateBooking booking) {
+    TempSaveBooking tempSaveBooking = new TempSaveBooking();
+    tempSaveBooking.setBookingId(booking.getBookingId());
+    tempSaveBooking.setPartnerUserId(booking.getPartnerUserId());
+    tempSaveBooking.setRate(booking.getRate());
+    tempSaveBooking.setAmount(booking.getAmount());
+    tempSaveBooking.setExpirationTime(booking.getExpirationTime());
+    tempSaveBooking.setMobileNumber(booking.getMobileNumber());
+    tempSaveBooking.setBusinessId(booking.getBusinessId());
+    tempSaveBooking.setWalletAddress(booking.getWalletAddress());
+    tempSaveBookingRepository.save(tempSaveBooking);
+}
 }
 
 

@@ -16,7 +16,6 @@ public class DuplicityProtectionFilter implements Filter {
 
     @Override
     public void apply(FilterContext context, FilterChain chain) throws SecurityException {
-        // Logic to check for duplicate bookings
         boolean isDuplicate = rateBookingService.hasUserBookedRateWithMobileNumberAndPartnerUserId(context.getMobileNumber(), context.getBusinessId());
 
         if (isDuplicate) {

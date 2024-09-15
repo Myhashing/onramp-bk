@@ -21,6 +21,9 @@ public abstract class Auditable {
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
+    //Todo: add deletedAt field
+
+
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
@@ -28,5 +31,7 @@ public abstract class Auditable {
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
     }
+
+
 }
 

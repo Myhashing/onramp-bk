@@ -12,26 +12,25 @@ import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 public class SecurityConfig {
-//TODO: active in production
 
-//    @Bean
-//    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-//        http
-//            .csrf(AbstractHttpConfigurer::disable)
-//            .authorizeHttpRequests(auth -> auth
-//                .requestMatchers("/", "/login**", "/error","/sendOtp", "/verifyOtp", "/magicLink",
-//                        "/sso/**","/swagger-ui/**","/v3/**","/register/**","/rate","/swaggers/**").permitAll()
-//                .anyRequest().authenticated()
-//            )
-//            .oauth2ResourceServer(oauth2 -> oauth2
-//                .jwt(withDefaults())
-//            );
-//        return http.build();
-//    }
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+            .csrf(AbstractHttpConfigurer::disable)
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/", "/login**", "/error","/sendOtp", "/verifyOtp", "/magicLink",
+                        "/sso/**","/swagger-ui/**","/v3/**","/register/**","/rate/**","/swaggers/**").permitAll()
+                .anyRequest().authenticated()
+            )
+            .oauth2ResourceServer(oauth2 -> oauth2
+                .jwt(withDefaults())
+            );
+        return http.build();
+    }
 
 
     //TODO: remove in production
-    @Bean
+/*    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
@@ -42,8 +41,9 @@ public class SecurityConfig {
                         .jwt(withDefaults())
                 );
         return http.build();
-    }
+    }*/
 
+    //TODO: Update in production
     @Bean
     public JwtDecoder jwtDecoder() {
         return NimbusJwtDecoder.withJwkSetUri("http://localhost:9011/.well-known/jwks.json").build();

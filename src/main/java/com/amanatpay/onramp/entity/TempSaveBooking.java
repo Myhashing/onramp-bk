@@ -1,15 +1,22 @@
-package com.amanatpay.onramp.dto;
+package com.amanatpay.onramp.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.persistence.*;
 import lombok.Data;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
+@Entity
 @Data
-public class RateBooking implements Serializable {
+public class TempSaveBooking extends Auditable {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private UUID id;
+
+    @Column(unique = true)
     private String bookingId;
     private Long partnerUserId;
     private BigDecimal rate;
@@ -22,11 +29,5 @@ public class RateBooking implements Serializable {
     private Long businessId;
     private String walletAddress;
 
-    // Constructor
-    public RateBooking() {}
 
-
-    // Getters and Setters
 }
-
-

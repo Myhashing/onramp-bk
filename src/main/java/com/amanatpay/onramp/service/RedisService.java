@@ -2,7 +2,9 @@ package com.amanatpay.onramp.service;
 
 import com.amanatpay.onramp.dto.RateBooking;
 import com.amanatpay.onramp.util.EncryptionUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -18,7 +20,7 @@ public class RedisService {
 
     private final RedisTemplate<String, Object> redisTemplate;
     private final EncryptionUtil encryptionUtil;
-
+    private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
     @Value("${default.numberOfAllowedBookingDuplicates}")
     private int numberOfAllowedBookingDuplicates;
 
@@ -41,9 +43,10 @@ public class RedisService {
      * @param duration  the duration for which the booking should be locked
      * @param timeUnit  the time unit for the duration (e.g., SECONDS, MINUTES)
      */
-    public void lockRate(String bookingId, RateBooking booking, long duration, TimeUnit timeUnit) {
+    public void lockRate(String bookingId, RateBooking booking, long duration, TimeUnit timeUnit) throws JsonProcessingException {
         String compositeKey = booking.getMobileNumber() + ":" + booking.getBusinessId();
-        String encryptedBooking = encryptionUtil.encrypt(booking.toString());
+        String encryptedBooking = encryptionUtil.encrypt(objectMapper.writeValueAsString(booking));
+//        String encryptedBooking = encryptionUtil.encrypt(booking.toString());
         redisTemplate.opsForValue().set(bookingId, encryptedBooking, duration, timeUnit);
         redisTemplate.opsForValue().set(compositeKey, bookingId, duration, timeUnit);
 
@@ -79,7 +82,7 @@ public class RedisService {
      * @throws RuntimeException if the conversion fails
      */
     private RateBooking convertStringToRateBooking(String bookingString) {
-        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectMapper objectMapper = this.objectMapper;
         try {
             return objectMapper.readValue(bookingString, RateBooking.class);
         } catch (IOException e) {
@@ -100,28 +103,28 @@ public class RedisService {
         return isBookingIdValid || isCompositeKeyValid;
     }
 
-        /**
- * Checks if a rate booking exists in Redis and is still valid (not expired),
- * limiting the check to a maximum of three times.
- *
- * @param bookingId    the unique identifier for the booking (optional)
- * @param compositeKey the composite key for the booking (optional)
- * @return true if the booking exists and is valid, and the count is three or less, false otherwise
- */
-public boolean isBookingValidNumberOfTimes(String bookingId, String compositeKey) {
-    int validCount = 0;
+    /**
+     * Checks if a rate booking exists in Redis and is still valid (not expired),
+     * limiting the check to a maximum of three times.
+     *
+     * @param bookingId    the unique identifier for the booking (optional)
+     * @param compositeKey the composite key for the booking (optional)
+     * @return true if the booking exists and is valid, and the count is three or less, false otherwise
+     */
+    public boolean isBookingValidNumberOfTimes(String bookingId, String compositeKey) {
+        int validCount = 0;
 
-    if (bookingId != null && redisTemplate.hasKey(bookingId)) {
-        validCount++;
+        if (bookingId != null && redisTemplate.hasKey(bookingId)) {
+            validCount++;
+        }
+
+        if (compositeKey != null && redisTemplate.hasKey(compositeKey)) {
+            validCount++;
+        }
+
+        // Add additional checks if there are more keys to validate
+        // For example, if you have more composite keys to check, add them here
+
+        return validCount > 0 && validCount <= numberOfAllowedBookingDuplicates;
     }
-
-    if (compositeKey != null && redisTemplate.hasKey(compositeKey)) {
-        validCount++;
-    }
-
-    // Add additional checks if there are more keys to validate
-    // For example, if you have more composite keys to check, add them here
-
-    return validCount > 0 && validCount <= numberOfAllowedBookingDuplicates;
-}
 }

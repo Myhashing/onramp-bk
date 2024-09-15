@@ -86,8 +86,8 @@ public class RateBookingService {
     }
 
     //implement the logic to check if the user has already booked the rate
-    public boolean hasUserBookedRateWithMobileNumberAndPartnerUserId(String mobileNumber, Long PartnerUserId) {
-        String compositeKey = mobileNumber + ":" + PartnerUserId;
+    public boolean hasUserBookedRateWithMobileNumberAndPartnerUserId(String mobileNumber, Long BusinessId) {
+        String compositeKey = mobileNumber + ":" + BusinessId;
         return redisService.isBookingValidNumberOfTimes(null, compositeKey);
     }
 }

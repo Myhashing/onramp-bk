@@ -1,6 +1,6 @@
 package com.amanatpay.onramp;
 
-import com.amanatpay.onramp.filter.IpAddressFilter;
+import com.amanatpay.onramp.filter.filters.IpAddressFilter;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;

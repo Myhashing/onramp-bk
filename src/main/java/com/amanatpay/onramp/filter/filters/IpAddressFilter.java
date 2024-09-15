@@ -1,6 +1,7 @@
-package com.amanatpay.onramp.filter;
+package com.amanatpay.onramp.filter.filters;
 
 import jakarta.servlet.*;
+import jakarta.servlet.Filter;
 import jakarta.servlet.http.HttpServletRequest;
 
 import java.io.IOException;

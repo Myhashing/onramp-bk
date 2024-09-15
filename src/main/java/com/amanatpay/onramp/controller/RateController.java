@@ -3,6 +3,9 @@ package com.amanatpay.onramp.controller;
 import com.amanatpay.onramp.dto.ApiResponse;
 import com.amanatpay.onramp.dto.FinalRate;
 import com.amanatpay.onramp.dto.RateBooking;
+import com.amanatpay.onramp.filter.FilterChain;
+import com.amanatpay.onramp.filter.FilterChainManager;
+import com.amanatpay.onramp.filter.FilterContext;
 import com.amanatpay.onramp.service.PriceCalculationService;
 import com.amanatpay.onramp.service.RateBookingService;
 import com.amanatpay.onramp.service.RedisService;
@@ -31,6 +34,7 @@ public class RateController {
 
     private final RateBookingService rateBookingService;
 
+    private final FilterChainManager filterChainManager;
 
     @Value("${default.systemFee}")
     private BigDecimal defaultSystemFee;
@@ -41,11 +45,13 @@ public class RateController {
     @Value("${default.redirectBaseUrl}")
     private String redirectBaseUrl;
 
-    public RateController(PriceCalculationService priceCalculationService, SpreadService spreadService, RedisService redisService, RateBookingService rateBookingService) {
+    public RateController(PriceCalculationService priceCalculationService, SpreadService spreadService,
+                          RedisService redisService, RateBookingService rateBookingService, FilterChainManager filterChainManager) {
         this.priceCalculationService = priceCalculationService;
         this.spreadService = spreadService;
         this.redisService = redisService;
         this.rateBookingService = rateBookingService;
+        this.filterChainManager = filterChainManager;
     }
 
 
@@ -90,6 +96,15 @@ public class RateController {
     @PostMapping("/book")
     public ApiResponse<Map<String, Object>> bookRate(@RequestParam @NotNull Long businessId, @RequestParam @NotNull BigDecimal amount, @RequestParam @NotNull Long partnerUserId, @RequestParam @NotNull String mobileNumber, @RequestParam(required = false) String nationalCode, @RequestParam(required = false) String postcode, @RequestParam(required = false) String birthdate, @RequestParam(required = false) String email, @RequestParam(required = false) String bankCardNumber, @RequestParam(required = false) String iban, @RequestParam(required = false) MultipartFile kycImage) {
         try {
+
+            // Apply filters
+            FilterContext context = new FilterContext();
+            context.setBusinessId(businessId);
+            context.setMobileNumber(mobileNumber);
+            context.setUserRole("CUSTOMER");
+            FilterChain filterChain = filterChainManager.createFilterChain(context);
+            filterChain.doFilter(context);
+
             // Calculate the weighted average price (WAP) based on the amount
             BigDecimal wap = priceCalculationService.calculateWAPByAmount(amount);
 
@@ -105,11 +120,17 @@ public class RateController {
             // Create a new RateBooking object
             RateBooking booking = new RateBooking(bookingId, partnerUserId, finalRate, amount, LocalDateTime.now().plusMinutes(5));
 
+            booking.setMobileNumber(mobileNumber);
+            booking.setBusinessId(businessId);
+
             // Lock the rate in Redis for 5 minutes
             redisService.lockRate(bookingId, booking, 5, TimeUnit.MINUTES);
 
             // Save temporary user data
             rateBookingService.saveTemporaryUserData(partnerUserId, mobileNumber, nationalCode, postcode, birthdate, email, bankCardNumber, iban, kycImage);
+
+            //console print the rate just saved in redis
+            //System.out.println("Rate just saved in redis: " + redisService.getRateBooking(bookingId));
 
             // Prepare the response data
             Map<String, Object> response = new HashMap<>();
@@ -125,6 +146,9 @@ public class RateController {
             return new ApiResponse<>(500, "Failed to book rate: " + e.getMessage(), null, e.getMessage());
         }
     }
+
+
+
 }
 
 

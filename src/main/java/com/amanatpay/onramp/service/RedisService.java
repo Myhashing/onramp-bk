@@ -42,10 +42,12 @@ public class RedisService {
      * @param timeUnit  the time unit for the duration (e.g., SECONDS, MINUTES)
      */
     public void lockRate(String bookingId, RateBooking booking, long duration, TimeUnit timeUnit) {
-        String compositeKey = booking.getMobileNumber() + ":" + booking.getBookingId();
+        String compositeKey = booking.getMobileNumber() + ":" + booking.getBusinessId();
         String encryptedBooking = encryptionUtil.encrypt(booking.toString());
         redisTemplate.opsForValue().set(bookingId, encryptedBooking, duration, timeUnit);
         redisTemplate.opsForValue().set(compositeKey, bookingId, duration, timeUnit);
+
+
     }
 
     /**

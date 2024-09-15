@@ -138,7 +138,7 @@
         <dependency>
             <groupId>co.elastic.apm</groupId>
             <artifactId>elastic-apm-agent</artifactId>
-            <version>1.49.0</version> <!-- Or the latest version -->
+            <version>1.51.0</version> <!-- Or the latest version -->
         </dependency>
 
         <dependency>

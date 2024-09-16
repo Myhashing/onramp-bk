@@ -1,9 +1,6 @@
-package com.amanatpay.onramp.service;
+package com.amanatpay.onramp.service.userServices;
 
 import com.amanatpay.onramp.dto.ApiResponse;
-import com.amanatpay.onramp.repository.UserProfileRepository;
-import com.amanatpay.onramp.util.EncryptionUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -32,8 +29,6 @@ public class AuthService {
     @Value("${fusionauth.bearer_token}")
     private String bearerToken;
 
-    public AuthService(UserProfileRepository userProfileRepository, EncryptionUtil encryptionUtil) {
-    }
 
     public ApiResponse<Map<String, Object>> authenticate(String mobileNumber, String ipAddress, String userAgent) {
         // Search for the user by mobile number
@@ -100,4 +95,6 @@ public class AuthService {
             return new ApiResponse<>(500, "Internal Server Error", null, e.getMessage());
         }
     }
+
+
 }

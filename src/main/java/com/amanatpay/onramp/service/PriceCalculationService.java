@@ -3,6 +3,7 @@ package com.amanatpay.onramp.service;
 import com.amanatpay.onramp.dto.FinalRate;
 import com.amanatpay.onramp.entity.PartnerBusiness;
 import com.amanatpay.onramp.repository.PartnerBusinessRepository;
+import com.amanatpay.onramp.service.nobitexService.NobitexService;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -194,7 +195,7 @@ public class PriceCalculationService {
         finalRateDto.setRate(finalRate);
         finalRateDto.setSystemFee(systemFee);
         finalRateDto.setTransactionFee(transactionFee);
-        finalRateDto.setTotalAmount(totalAmount);
+        finalRateDto.setTotalAmount(totalAmount.setScale(2, RoundingMode.UP));
         finalRateDto.setUsdtAmount(amount.subtract(transactionFee));
 
         return finalRateDto;

@@ -6,6 +6,8 @@ import com.amanatpay.onramp.entity.TemporaryUserData;
 import com.amanatpay.onramp.exception.BookingExpiredException;
 import com.amanatpay.onramp.repository.TempSaveBookingRepository;
 import com.amanatpay.onramp.repository.TemporaryUserDataRepository;
+import com.amanatpay.onramp.service.kycService.KycService;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -53,12 +55,11 @@ public class RateBookingService {
         TemporaryUserData tempUserData = new TemporaryUserData();
         tempUserData.setPartnerUserId(PartnerUserId);
         tempUserData.setMobileNumber(mobileNumber);
+        tempUserData.setNationalCode(nationalCode);
+
         boolean hasOptionalData = false;
 
-        if (nationalCode != null) {
-            tempUserData.setNationalCode(nationalCode);
-            hasOptionalData = true;
-        }
+
         if (postcode != null) {
             tempUserData.setPostcode(postcode);
             hasOptionalData = true;
@@ -97,23 +98,30 @@ public class RateBookingService {
     }
 
 
-/**
- * Saves a rate booking to the temporary booking repository.
- *
- * @param booking The RateBooking object containing the booking details to be saved.
- */
-public void saveBooking(RateBooking booking) {
-    TempSaveBooking tempSaveBooking = new TempSaveBooking();
-    tempSaveBooking.setBookingId(booking.getBookingId());
-    tempSaveBooking.setPartnerUserId(booking.getPartnerUserId());
-    tempSaveBooking.setRate(booking.getRate());
-    tempSaveBooking.setAmount(booking.getAmount());
-    tempSaveBooking.setExpirationTime(booking.getExpirationTime());
-    tempSaveBooking.setMobileNumber(booking.getMobileNumber());
-    tempSaveBooking.setBusinessId(booking.getBusinessId());
-    tempSaveBooking.setWalletAddress(booking.getWalletAddress());
-    tempSaveBookingRepository.save(tempSaveBooking);
-}
+    /**
+     * Saves a rate booking to the temporary booking repository.
+     *
+     * @param booking The RateBooking object containing the booking details to be saved.
+     *
+     * @return the TempSaveBooking object containing the saved booking details
+     */
+    public TempSaveBooking saveBooking(RateBooking booking) {
+        TempSaveBooking tempSaveBooking = new TempSaveBooking();
+        tempSaveBooking.setBookingId(booking.getBookingId());
+        tempSaveBooking.setPartnerUserId(booking.getPartnerUserId());
+        tempSaveBooking.setRate(booking.getRate());
+        tempSaveBooking.setAmount(booking.getAmount());
+        tempSaveBooking.setExpirationTime(booking.getExpirationTime());
+        tempSaveBooking.setMobileNumber(booking.getMobileNumber());
+        tempSaveBooking.setBusinessId(booking.getBusinessId());
+        tempSaveBooking.setWalletAddress(booking.getWalletAddress());
+        tempSaveBooking.setNationalCode(booking.getNationalCode());
+        return tempSaveBookingRepository.save(tempSaveBooking);
+    }
+
+    public TempSaveBooking getTempSaveBooking(@NotNull String bookingId) {
+        return tempSaveBookingRepository.findByBookingId(bookingId);
+    }
 }
 
 

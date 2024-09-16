@@ -1,4 +1,4 @@
-package com.amanatpay.onramp.service;
+package com.amanatpay.onramp.service.nobitexService;
 
 import com.amanatpay.onramp.dto.AlertCategory;
 import com.amanatpay.onramp.dto.AlertLevel;
@@ -8,6 +8,8 @@ import com.amanatpay.onramp.entity.TradeData;
 import com.amanatpay.onramp.exception.DataUnavailableException;
 import com.amanatpay.onramp.repository.NobitexOrderBookDataRepository;
 import com.amanatpay.onramp.repository.TradeDataRepository;
+import com.amanatpay.onramp.service.NotificationService;
+import com.amanatpay.onramp.service.SystemAdminService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;

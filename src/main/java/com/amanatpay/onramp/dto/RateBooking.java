@@ -21,6 +21,7 @@ public class RateBooking implements Serializable {
     private String mobileNumber;
     private Long businessId;
     private String walletAddress;
+    private String nationalCode;
 
     // Constructor
     public RateBooking() {}

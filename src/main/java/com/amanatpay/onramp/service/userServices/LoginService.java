@@ -1,4 +1,4 @@
-package com.amanatpay.onramp.service;
+package com.amanatpay.onramp.service.userServices;
 
 import com.amanatpay.onramp.dto.ApiResponse;
 import org.springframework.beans.factory.annotation.Value;

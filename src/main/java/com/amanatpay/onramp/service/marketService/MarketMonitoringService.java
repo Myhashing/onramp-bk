@@ -1,5 +1,6 @@
-package com.amanatpay.onramp.service;
+package com.amanatpay.onramp.service.marketService;
 
+import com.amanatpay.onramp.service.TradeDataService;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;

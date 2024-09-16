@@ -1,5 +1,6 @@
 package com.amanatpay.onramp.service;
 
+import com.amanatpay.onramp.service.nobitexService.NobitexService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;

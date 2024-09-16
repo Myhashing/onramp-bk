@@ -1,9 +1,8 @@
 package com.amanatpay.onramp.controller;
 
 import com.amanatpay.onramp.dto.ApiResponse;
-import com.amanatpay.onramp.service.AuthService;
-import com.amanatpay.onramp.service.OtpService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.amanatpay.onramp.service.userServices.AuthService;
+import com.amanatpay.onramp.service.userServices.OtpService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;

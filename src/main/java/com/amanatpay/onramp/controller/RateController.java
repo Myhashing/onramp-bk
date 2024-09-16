@@ -3,6 +3,7 @@ package com.amanatpay.onramp.controller;
 import com.amanatpay.onramp.dto.ApiResponse;
 import com.amanatpay.onramp.dto.FinalRate;
 import com.amanatpay.onramp.dto.RateBooking;
+import com.amanatpay.onramp.entity.TempSaveBooking;
 import com.amanatpay.onramp.filter.FilterChain;
 import com.amanatpay.onramp.filter.FilterChainManager;
 import com.amanatpay.onramp.filter.FilterContext;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -35,6 +37,7 @@ public class RateController {
     private final RateBookingService rateBookingService;
 
     private final FilterChainManager filterChainManager;
+
 
     @Value("${default.systemFee}")
     private BigDecimal defaultSystemFee;
@@ -100,7 +103,7 @@ public class RateController {
             @RequestParam @NotNull Long partnerUserId,
             @RequestParam @NotNull String mobileNumber,
             @RequestParam @NotNull String walletAddress,
-            @RequestParam(required = false) String nationalCode,
+            @RequestParam @NotNull String nationalCode,
             @RequestParam(required = false) String postcode,
             @RequestParam(required = false) String birthdate,
             @RequestParam(required = false) String email,
@@ -135,12 +138,13 @@ public class RateController {
 
             booking.setBookingId(bookingId);
             booking.setPartnerUserId(partnerUserId);
-            booking.setRate(finalRate);
+            booking.setRate(finalRate.setScale(2, RoundingMode.UP));
             booking.setAmount(amount);
             booking.setExpirationTime(LocalDateTime.now().plusMinutes(5));
             booking.setMobileNumber(mobileNumber);
             booking.setBusinessId(businessId);
             booking.setWalletAddress(walletAddress);
+            booking.setNationalCode(nationalCode);
 
             // Lock the rate in Redis for 5 minutes
             redisService.lockRate(bookingId, booking, 5, TimeUnit.MINUTES);
@@ -189,30 +193,31 @@ public class RateController {
      * Retrieves a rate booking from Redis and optionally saves it to the database.
      *
      * @param bookingId   The unique identifier of the booking to be retrieved.
-     * @param saveBooking A boolean flag indicating whether to save the booking to the database.
      * @return ApiResponse containing the booking details if found, or an error message if not found or if an exception occurs.
      */
     @GetMapping("/retrieve")
-    public ApiResponse<Map<String, Object>> retrieveBooking(@RequestParam @NotNull String bookingId, @RequestParam @NotNull Boolean saveBooking) {
+    public ApiResponse<Map<String, Object>> retrieveBooking(@RequestParam @NotNull String bookingId) {
         try {
             // Retrieve the booking from Redis
             RateBooking booking = redisService.getRateBooking(bookingId);
             if (booking == null) {
                 return new ApiResponse<>(404, "Booking not found", null, null);
             }
+
             // Save the booking in the database if requested
-            if (saveBooking) {
-                rateBookingService.saveBooking(booking);
-            }
+
+                 TempSaveBooking tempSaveBooking = rateBookingService.saveBooking(booking);
+
             // Prepare the response data
             Map<String, Object> response = new HashMap<>();
-            response.put("bookingId", booking.getBookingId());
+            response.put("bookingId",  tempSaveBooking.getBookingId() );
             response.put("rate", booking.getRate());
             response.put("amount", booking.getAmount());
             response.put("expiresAt", booking.getExpirationTime());
             response.put("mobileNumber", booking.getMobileNumber());
             response.put("walletAddress", booking.getWalletAddress());
             response.put("businessId", booking.getBusinessId());
+            response.put("nationalCode", booking.getNationalCode());
             // Return a successful response
             return new ApiResponse<>(200, "Booking retrieved successfully", response, null);
         } catch (Exception e) {
@@ -220,6 +225,10 @@ public class RateController {
             return new ApiResponse<>(500, "Failed to retrieve booking: " + e.getMessage(), null, e.getMessage());
         }
     }
+
+
+
+
 
 }
 

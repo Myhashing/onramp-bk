@@ -1,4 +1,4 @@
-package com.amanatpay.onramp.service;
+package com.amanatpay.onramp.service.kycService;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;

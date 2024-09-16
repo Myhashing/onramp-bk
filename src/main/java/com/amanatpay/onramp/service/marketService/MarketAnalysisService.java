@@ -1,7 +1,8 @@
-package com.amanatpay.onramp.service;
+package com.amanatpay.onramp.service.marketService;
 
 import com.amanatpay.onramp.dto.AlertCategory;
 import com.amanatpay.onramp.dto.AlertLevel;
+import com.amanatpay.onramp.service.NotificationService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 

@@ -1,6 +1,8 @@
 package com.amanatpay.onramp.service;
 
 import com.amanatpay.onramp.entity.TradeData;
+import com.amanatpay.onramp.service.marketService.MarketAnalysisService;
+import com.amanatpay.onramp.service.nobitexService.NobitexService;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;

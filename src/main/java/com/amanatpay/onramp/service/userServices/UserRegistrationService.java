@@ -1,11 +1,11 @@
-package com.amanatpay.onramp.service;
+package com.amanatpay.onramp.service.userServices;
 
 import com.amanatpay.onramp.dto.ApiResponse;
 import com.amanatpay.onramp.dto.UserRegistrationRequest;
-import io.fusionauth.client.FusionAuthClient;
+import com.amanatpay.onramp.exception.UserNotFoundException;
+import io.fusionauth.domain.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -18,6 +18,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 
 @Service
 public class UserRegistrationService {
@@ -32,15 +33,15 @@ public class UserRegistrationService {
     private String registrationUrl;
     private final RestTemplate restTemplate;
     private final OtpService otpService;
-    private final FusionAuthClient fusionAuthClient;
+    private final FusionAuthService fusionAuthService;
 
-    public UserRegistrationService(RestTemplate restTemplate, OtpService otpService, FusionAuthClient fusionAuthClient) {
+    public UserRegistrationService(RestTemplate restTemplate, OtpService otpService, FusionAuthService fusionAuthService) {
         this.restTemplate = restTemplate;
         this.otpService = otpService;
-        this.fusionAuthClient = fusionAuthClient;
+        this.fusionAuthService = fusionAuthService;
     }
 
-    public ApiResponse<String> sendOtp(UserRegistrationRequest request, String ipAddress, String userAgent) {
+    public ApiResponse<String> sendOtpForUserRegister(UserRegistrationRequest request, String ipAddress, String userAgent) {
         Objects.requireNonNull(request.getMobilePhone(), "Mobile phone is required");
         Objects.requireNonNull(request.getNationalId(), "National ID is required");
         Objects.requireNonNull(request.getPassword(), "Password is required");
@@ -118,63 +119,35 @@ public class UserRegistrationService {
         }
     }
 
-
-/*
-    public ApiResponse<Map> registerSubUser(SubUserRegistrationRequest request) {
-        // Register the sub-user in FusionAuth
-        Map<String, Object> user = new HashMap<>();
-        user.put("password", request.getUserPassword());
-        user.put("username", request.getUserName());
-        user.put("mobilePhone", request.getMobilePhone());
-        user.put("businessId", request.getBusinessId());
-        user.put("userType", "corporate-sub-user");
-        if (request.getUserEmail() != null) {
-            user.put("email", request.getUserEmail());
+    public Boolean sendOtp(UUID userId, String ipAddress, String userAgent) throws UserNotFoundException {
+        User user = fusionAuthService.retrieveUserById(userId);
+        if (user == null) {
+            throw new UserNotFoundException("User not found");
         }
-        if ("full-access".equals(request.getAccessLevel())) {
-            user.put("roles", new String[]{"CORPORATE_ADMIN"});
-        } else {
-            user.put("roles", new String[]{"CORPORATE_USER"});
-        }
-
-        // Set default KYC values
-        Map<String, Object> kycData = new HashMap<>();
-        kycData.put("mobileVerified", false);
-        kycData.put("emailVerified", false);
-        kycData.put("addressVerified", false);
-        kycData.put("kycLevel", 0);
-        kycData.put("videoVerified", false);
-        kycData.put("kycNotes", null);
-
-        Map<String, Object> data = new HashMap<>();
-        data.put("kyc", kycData);
-        user.put("data", data);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Content-Type", "application/json");
-        headers.set("Authorization", bearerToken);
-        Map<String, Object> registration = new HashMap<>();
-        registration.put("applicationId", applicationId);
-        Map<String, Object> body = new HashMap<>();
-        body.put("user", user);
-        body.put("registration", registration);
-
-        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(body, headers);
-        try {
-            ResponseEntity<Map> response = restTemplate.exchange(registrationUrl, HttpMethod.POST, entity, Map.class);
-
-            if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
-                return new ApiResponse<>(200, "Success", response.getBody(), null);
-            } else {
-                return new ApiResponse<>(response.getStatusCodeValue(), "Error Registering User", null, response.getBody().toString());
-            }
-        } catch (HttpClientErrorException e) {
-            throw e; // Let the global exception handler handle this
-        } catch (Exception e) {
-            // Log the exception
-            return new ApiResponse<>(500, "Internal Server Error", null, e.getMessage());
-        }
-
+        String mobileNumber = user.mobilePhone;
+        otpService.sendOtp(mobileNumber, ipAddress, userAgent);
+        return true;
     }
-*/
+
+    public boolean verifyOtp(UUID userId, String otp, String ipAddress, String userAgent) throws UserNotFoundException {
+        User user = fusionAuthService.retrieveUserById(userId);
+        if (user == null) {
+            throw new UserNotFoundException("User not found");
+        }
+        String mobileNumber = user.mobilePhone;
+        return otpService.verifyOtp(mobileNumber, otp, ipAddress, userAgent);
+    }
+
+    public boolean verifyUserOTPForKYC(UUID userId) throws UserNotFoundException {
+        User user = fusionAuthService.retrieveUserById(userId);
+        if (user == null) {
+            throw new UserNotFoundException("User not found");
+        }
+        user.verified = true;
+        if (user.data.get("kycLevel") == null || (int) user.data.get("kycLevel") < 1) {
+            user.data.put("kycLevel", 1);
+            fusionAuthService.updateUser(user);
+        }
+        return true;
+    }
 }

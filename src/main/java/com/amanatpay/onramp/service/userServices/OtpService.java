@@ -1,4 +1,4 @@
-package com.amanatpay.onramp.service;
+package com.amanatpay.onramp.service.userServices;
 
 import com.amanatpay.onramp.dto.ApiResponse;
 import com.amanatpay.onramp.util.EncryptionUtil;
@@ -6,7 +6,6 @@ import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
 import io.github.bucket4j.Bucket4j;
 import io.github.bucket4j.Refill;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -35,6 +34,7 @@ public class OtpService {
     }
 
     public ApiResponse<Map<String, Object>> sendOtp(String mobileNumber, String ipAddress, String userAgent) {
+
         Bucket bucket = rateLimiters.computeIfAbsent(mobileNumber, k -> Bucket4j.builder()
                 .addLimit(Bandwidth.classic(5, Refill.greedy(5, Duration.ofMinutes(1))))
                 .build());

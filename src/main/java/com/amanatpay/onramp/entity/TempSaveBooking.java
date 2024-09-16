@@ -13,7 +13,6 @@ import java.util.UUID;
 public class TempSaveBooking extends Auditable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
     @Column(unique = true)
@@ -28,6 +27,7 @@ public class TempSaveBooking extends Auditable {
     private String mobileNumber;
     private Long businessId;
     private String walletAddress;
+    private String nationalCode;
 
 
 }

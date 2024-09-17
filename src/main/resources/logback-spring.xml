@@ -2,7 +2,7 @@
 <configuration>
     <include resource="org/springframework/boot/logging/logback/base.xml" />
     <appender name="LOGSTASH" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>../logs/onramp.log</file> <!-- add your log file path -->.
+        <file>../../logs/onramp.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <fileNamePattern>./logs/spring-boot-logs-%d{yyyy-MM-dd}.log</fileNamePattern>
             <maxHistory>1</maxHistory><!-- log file will override after one day-->

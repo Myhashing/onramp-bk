@@ -2,14 +2,13 @@ package com.amanatpay.onramp.controller;
 
 import com.amanatpay.onramp.dto.*;
 import com.amanatpay.onramp.service.userServices.FusionAuthService;
-import com.amanatpay.onramp.service.userServices.UserManagementService;
 import com.amanatpay.onramp.service.userServices.UserRegistrationService;
 import com.inversoft.error.Errors;
 import com.inversoft.rest.ClientResponse;
 import io.fusionauth.domain.User;
 import io.fusionauth.domain.api.UserRequest;
 import io.fusionauth.domain.api.UserResponse;
-import org.springframework.http.ResponseEntity;
+import jakarta.annotation.Nullable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -18,12 +17,10 @@ import java.util.UUID;
 @RequestMapping("/users")
 public class UsersController {
 
-    private final UserManagementService userService;
     private final FusionAuthService fusionAuthService;
     private final UserRegistrationService userRegistrationService;
 
-    public UsersController(UserManagementService userService, FusionAuthService fusionAuthService, UserRegistrationService userRegistrationService) {
-        this.userService = userService;
+    public UsersController(FusionAuthService fusionAuthService, UserRegistrationService userRegistrationService) {
         this.fusionAuthService = fusionAuthService;
         this.userRegistrationService = userRegistrationService;
     }
@@ -75,16 +72,20 @@ public class UsersController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<UserCreationResponse> createUser(
+    public ApiResponse<UserCreationResponse> createUser(
             @RequestParam String mobileNumber,
             @RequestParam String nationalCode,
-            @RequestBody AdditionalUserData additionalData) {
+            @RequestBody @Nullable AdditionalUserData additionalData) {
         try {
             // Create a new user object
             User user = new User();
             user.mobilePhone = mobileNumber;
             user.username = nationalCode;
-            user.data = additionalData.toMap();
+            // Generate a random password or use a default password
+            user.password = userRegistrationService.generateRandomPassword();
+            if (additionalData != null) {
+                user.data = additionalData.toMap();
+            }
 
             // Create the user in FusionAuth
             UserRequest request = new UserRequest(user);
@@ -95,17 +96,18 @@ public class UsersController {
                 // Return a success response
                 User createdUser = response.successResponse.user;
                 UserCreationResponse userCreationResponse = new UserCreationResponse(createdUser.id, "User created successfully");
-                return ResponseEntity.ok(userCreationResponse);
+                return new ApiResponse<>(200, "User created successfully", userCreationResponse, null);
             } else {
                 // Handle errors
                 String errorMessage = response.errorResponse != null ? response.errorResponse.toString() : "Unknown error";
-                return ResponseEntity.status(500).body(new UserCreationResponse(null, "Failed to create user: " + errorMessage));
+                return new ApiResponse<>(500, "Failed to create user: " + errorMessage, null, null);
             }
         } catch (Exception e) {
             // Handle exceptions
-            return ResponseEntity.status(500).body(new UserCreationResponse(null, "Failed to create user: " + e.getMessage()));
+            return new ApiResponse<>(500, "Failed to create user: ", null, e.getMessage());
         }
     }
+
 
     //send otp to created user
     @PostMapping("/send-otp")

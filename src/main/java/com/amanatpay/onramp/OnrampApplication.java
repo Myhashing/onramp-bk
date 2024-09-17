@@ -24,4 +24,14 @@ public class OnrampApplication {
         registrationBean.addUrlPatterns("/*");
         return registrationBean;
     }
+
+    @Bean
+    public org.springframework.web.filter.CommonsRequestLoggingFilter requestLoggingFilter() {
+        org.springframework.web.filter.CommonsRequestLoggingFilter loggingFilter = new org.springframework.web.filter.CommonsRequestLoggingFilter();
+        loggingFilter.setIncludeClientInfo(true);
+        loggingFilter.setIncludeQueryString(true);
+        loggingFilter.setIncludePayload(true);
+        loggingFilter.setMaxPayloadLength(10000);
+        return loggingFilter;
+    }
 }

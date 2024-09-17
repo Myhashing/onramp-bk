@@ -48,7 +48,7 @@ public class FusionAuthService {
     @Value("${fusionauth.api-key}")
     private String apiKey;
 
-    private final FusionAuthClient client;
+    private FusionAuthClient client;
     private static final Logger logger = LoggerFactory.getLogger(FusionAuthService.class);
 
     public FusionAuthService() {
@@ -72,6 +72,8 @@ public class FusionAuthService {
 
 
     public User searchUserByUsername(String username) throws FusionAuthException, UserNotFoundException {
+        client = new FusionAuthClient(apiKey, baseUrl);
+
         ClientResponse<UserResponse, Errors> response = client.retrieveUserByUsername(username);
 
         if (response.wasSuccessful()) {
@@ -148,6 +150,8 @@ public class FusionAuthService {
     }
 
     public ClientResponse<UserResponse, Errors> createUser(UserRequest request) {
+                        client = new FusionAuthClient(apiKey, baseUrl);
+
         return client.createUser(null, request);
     }
 
@@ -160,5 +164,6 @@ public class FusionAuthService {
         client.updateUser(user.id, new UserRequest(user));
 
     }
+
 }
 

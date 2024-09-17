@@ -62,7 +62,7 @@ fusionauth:
   search_url: http://localhost:9011/api/user/search
   bearer_token: yJBgEtj9mCspXV1Ukk0uZd-K5s_vntr1fbGBtKmSfXZ_SMtEfqPf3P4x
   registration_url: http://localhost:9011/api/user/registration
-  base-url: http://localhost:9011
+  base-url: http://localhost:9011/
   api-key: yJBgEtj9mCspXV1Ukk0uZd-K5s_vntr1fbGBtKmSfXZ_SMtEfqPf3P4x
 
 
@@ -70,43 +70,43 @@ nobitex:
   api:
     base-url: https://api.nobitex.ir/v2
 
-logging:
-  file:
-    name: logs/onramp.log
-  level:
-    org.hibernate.SQL: DEBUG
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
-    com.onramp.controller: DEBUG
-    com.onramp.service: DEBUG
-    org.springframework.security: DEBUG
-    org.springframework.web: DEBUG
-    org.springframework.data.redis: DEBUG
+#logging:
+#  file:
+#    name: logs/onramp.log
+#  level:
+#    org.hibernate.SQL: DEBUG
+#    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+#    com.onramp.controller: DEBUG
+#    com.onramp.service: DEBUG
+#    org.springframework.security: DEBUG
+#    org.springframework.web: DEBUG
+#    org.springframework.data.redis: DEBUG
 
-elastic:
-  apm:
-    service_name: my-spring-app
-    server_urls: http://localhost:8200
-    environment: production
-    application_packages: com.onramp
+#elastic:
+#  apm:
+#    service_name: my-spring-app
+#    server_urls: http://localhost:8200
+#    environment: production
+#    application_packages: com.onramp
 
-
-management:
-  endpoint:
-    web:
-      exposure:
-        include: "*"
-  metrics:
-    export:
-      elasticsearch:
-        enabled: true
-        host: http://localhost:9201  # Elasticsearch URL
-        index: metrics-onramp  # Customize the index name
-  elastic:
-    metrics:
-      export:
-        enabled: true
-        host: http://localhost:9201  # Elasticsearch URL
-        index: metrics-onramp  # Customize the index name
+#
+#management:
+#  endpoint:
+#    web:
+#      exposure:
+#        include: "*"
+#  metrics:
+#    export:
+#      elasticsearch:
+#        enabled: true
+#        host: http://localhost:9201  # Elasticsearch URL
+#        index: metrics-onramp  # Customize the index name
+#  elastic:
+#    metrics:
+#      export:
+#        enabled: true
+#        host: http://localhost:9201  # Elasticsearch URL
+#        index: metrics-onramp  # Customize the index name
 
 
 spread:
@@ -126,3 +126,22 @@ default:
   transactionFee: 4.0
   redirectBaseUrl: https://www.amanatpay.com/redirect/booking/
   numberOfAllowedBookingDuplicates: 3
+
+
+
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    io.lettuce.core: DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.web.client: DEBUG
+    org.springframework.web.reactive.function.client: DEBUG
+    org.springframework.data.redis: DEBUG
+    org.springframework.web.filter.AbstractRequestLoggingFilter: DEBUG
+
+elastic:
+    apm:
+        service_name: onramp
+        server_urls: http://elasticsearch:8200
+        application_packages: com.onramp

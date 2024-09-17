@@ -4,6 +4,7 @@ import com.amanatpay.onramp.dto.ApiResponse;
 import com.amanatpay.onramp.dto.UserRegistrationRequest;
 import com.amanatpay.onramp.exception.UserNotFoundException;
 import io.fusionauth.domain.User;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -149,5 +150,10 @@ public class UserRegistrationService {
             fusionAuthService.updateUser(user);
         }
         return true;
+    }
+
+        public String generateRandomPassword() {
+        // Generate a random password length of 8 characters
+        return RandomStringUtils.randomAlphanumeric(8);
     }
 }
